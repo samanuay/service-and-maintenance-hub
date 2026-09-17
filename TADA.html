@@ -1,0 +1,1157 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; }
+  body, div, p, span, label, h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+  h1, h2, h3, .v3-form-title, .v4-form-title { font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif !important; }
+
+  .v3-input, .v4-input, input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    color: #f8fafc !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    outline: none !important;
+    width: 100%;
+    transition: all 0.2s ease;
+  }
+  .v3-input:focus, .v4-input:focus, input:focus, select:focus, textarea:focus {
+    border-color: #00e5ff !important;
+    box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2) !important;
+  }
+</style>
+
+<!-- TA / DA Portal Module V3 -->
+<div class="v3-module-container" style="max-width: 800px; margin: 0 auto;">
+  <div style="background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); overflow: hidden; display: flex; flex-direction: column;">
+    
+    <!-- Header Banner -->
+    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 24px 20px; text-align: center;">
+      <h1 style="font-family:'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 4px;">GOEC Claim Portal</h1>
+      <p style="color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">SERVICE ENGINEER TA/DA EXPENSE PORTAL</p>
+    </div>
+
+    <!-- Claim Form -->
+    <form id="v3TadaClaimForm" onsubmit="handleV3TadaSubmit(event)" style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+      
+      <!-- Auto-Fetched Profile Indicator -->
+      <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:20px;">👤</span>
+          <div>
+            <div style="font-size:14px; font-weight:700; color:#fff;" id="v3TadaEngDisplay">Loading Profile...</div>
+            <div style="font-size:11px; color:#94a3b8;" id="v3TadaRoleDisplay">Logged-in Field Engineer</div>
+          </div>
+        </div>
+        <span style="font-size:11px; background:rgba(16,185,129,0.15); color:#10b981; padding:4px 12px; border-radius:12px; font-weight:600;">Verified User</span>
+      </div>
+
+      <!-- Claim Date Selector -->
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+        <label for="v3_tada_date" style="font-size:13px; font-weight:700; color:#00e5ff; display:flex; align-items:center; gap:8px;">
+          <span>📅</span> CLAIM DATE <span style="color:#f43f5e;">*</span>
+        </label>
+        <input type="date" id="v3_tada_date" required class="v3-input" style="max-width: 220px; font-weight:700; color:#00e5ff; background: rgba(0,0,0,0.3) !important;">
+      </div>
+
+      <!-- Action Bar: Add 4 Option Logs -->
+      <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 18px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #10b981;">SELECT CLAIM OPTION TO ADD:</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; position:relative; z-index:100;">
+          <button type="button" id="v3BtnAddTravel" onclick="addV3LogRecord('Travel')" style="background:#10b981; border:none; border-radius:10px; padding:12px 18px; color:#fff; font-weight:700; cursor:pointer; font-size:13px; transition:all 0.15s; box-shadow:0 4px 12px rgba(16,185,129,0.3); user-select:none; -webkit-user-select:none;">🚗 + Travel</button>
+          <button type="button" id="v3BtnAddFood" onclick="addV3LogRecord('Food')" style="background:#f59e0b; border:none; border-radius:10px; padding:12px 18px; color:#fff; font-weight:700; cursor:pointer; font-size:13px; transition:all 0.15s; box-shadow:0 4px 12px rgba(245,158,11,0.3); user-select:none; -webkit-user-select:none;">🍱 + Food</button>
+          <button type="button" id="v3BtnAddStay" onclick="addV3LogRecord('Stay')" style="background:#3b82f6; border:none; border-radius:10px; padding:12px 18px; color:#fff; font-weight:700; cursor:pointer; font-size:13px; transition:all 0.15s; box-shadow:0 4px 12px rgba(59,130,246,0.3); user-select:none; -webkit-user-select:none;">🏨 + Accommodation</button>
+          <button type="button" id="v3BtnAddCons" onclick="addV3LogRecord('Consumable')" style="background:#a855f7; border:none; border-radius:10px; padding:12px 18px; color:#fff; font-weight:700; cursor:pointer; font-size:13px; transition:all 0.15s; box-shadow:0 4px 12px rgba(168,85,247,0.3); user-select:none; -webkit-user-select:none;">🔧 + Consumables</button>
+        </div>
+      </div>
+
+      <!-- Logs Container -->
+      <div id="v3TadaLogsList" style="display: flex; flex-direction: column; gap: 16px;"></div>
+
+      <!-- Live Category Totals Summary Bar -->
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; font-weight: 600;">
+          <span style="color: #10b981;">Travel: ₹<span id="v3_travel_sum">0.00</span></span>
+          <span style="color: #f59e0b;">Food: ₹<span id="v3_food_sum">0.00</span></span>
+          <span style="color: #3b82f6;">Accommodation: ₹<span id="v3_stay_sum">0.00</span></span>
+          <span style="color: #a855f7;">Consumables: ₹<span id="v3_cons_sum">0.00</span></span>
+        </div>
+        <div style="font-size: 15px; font-weight: 700; color: #fff;">
+          Total Claim: <span style="color: #00e676;">₹<span id="v3_grand_sum">0.00</span></span>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <button type="submit" class="v3-btn" style="width: 100%; padding: 14px; font-size: 16px; background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); font-weight: 700; border-radius: 12px;">
+        Save Daily Claim Record
+      </button>
+    </form>
+
+    <!-- Submitted Claims History Section -->
+    <div style="background: rgba(255, 255, 255, 0.02); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+        <div>
+          <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0;">📊 My Submitted Claims History</h3>
+          <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0 0;">View your claim history filtered by month with separated Travel, Food, Accommodation &amp; Consumables breakdowns.</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <input type="month" id="v3TadaHistoryMonth" class="v3-input" onchange="loadV3TadaHistory()" style="min-height:38px; padding:4px 10px; font-size:12px; width:auto;">
+          <button type="button" onclick="loadV3TadaHistory()" style="background:rgba(59,130,246,0.15); color:#3b82f6; border:1px solid rgba(59,130,246,0.3); padding:8px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px; color:#cbd5e1; text-align:left;">
+          <thead>
+            <tr style="background:rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.1);">
+              <th style="padding:10px; color:#94a3b8;">Claim ID</th>
+              <th style="padding:10px; color:#94a3b8;">Date</th>
+              <th style="padding:10px; color:#10b981; text-align:right;">Travel (₹)</th>
+              <th style="padding:10px; color:#f59e0b; text-align:right;">Food (₹)</th>
+              <th style="padding:10px; color:#3b82f6; text-align:right;">Accommodation (₹)</th>
+              <th style="padding:10px; color:#a855f7; text-align:right;">Consumables (₹)</th>
+              <th style="padding:10px; color:#fff; text-align:right;">Total (₹)</th>
+              <th style="padding:10px; color:#94a3b8;">Details</th>
+            </tr>
+          </thead>
+          <tbody id="v3TadaHistoryBody">
+            <tr>
+              <td colspan="8" style="padding:20px; text-align:center; color:#94a3b8;">Loading claim history...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Fortnightly PDF Report Download Section -->
+    <div style="background: rgba(255, 255, 255, 0.02); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 24px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px;">📄 Download Consolidated PDF Expense Reports</h3>
+      <p style="font-size: 12px; color: #94a3b8; margin-bottom: 16px;">Generate formal PDF reports for 15-day claim cycles. Choose between Daily Summary or Itemized Breakdown report.</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: end;">
+        <div>
+          <label style="display:block; font-size:11px; color:#94a3b8; margin-bottom:6px;">Select Month &amp; Year</label>
+          <input type="month" id="v3PdfMonth" class="v3-input">
+        </div>
+        
+        <div>
+          <label style="display:block; font-size:11px; color:#94a3b8; margin-bottom:6px;">Select Claim Cycle Period</label>
+          <select id="v3PdfCycle" class="v3-input">
+            <option value="1-15">Cycle 1: 1st to 15th</option>
+            <option value="16-end" selected>Cycle 2: 16th to 30th / 31st</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; color:#94a3b8; margin-bottom:6px;">Select Report Type</label>
+          <select id="v3PdfReportType" class="v3-input" style="border-color: rgba(16, 185, 129, 0.4);">
+            <option value="daily" selected>📊 Daily Summary Report</option>
+            <option value="itemized">📝 Itemized Breakdown Report</option>
+          </select>
+        </div>
+
+        <button type="button" id="v3PdfDownloadBtn" onclick="downloadV3FortnightlyPDF()" style="background:linear-gradient(135deg, #10b981, #3b82f6); border:none; border-radius:10px; padding:12px; color:#fff; font-weight:700; cursor:pointer; height:44px; transition:all 0.2s;">📥 Download PDF Report</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var recordCounterV3 = 0;
+
+
+
+  // Function to sync and display profile badge instantly
+  function updateTadaProfileBadge() {
+    try {
+      var user = window.currentUserV3;
+      if (!user) {
+        try { user = JSON.parse(localStorage.getItem('goec_user_v3') || '{}'); } catch(e){}
+      }
+      var name = (user && (user.fullName || user.username)) ? (user.fullName || user.username) : '';
+      var role = (user && user.role) ? user.role : '';
+
+      if (!name) {
+        var chipName = document.getElementById('v3ProfileName');
+        if (chipName && chipName.textContent && chipName.textContent.trim() !== 'Loading Profile...') {
+          name = chipName.textContent.trim();
+        }
+      }
+      if (!role) {
+        var chipRole = document.getElementById('v3ProfileRole');
+        if (chipRole && chipRole.textContent) {
+          role = chipRole.textContent.trim();
+        }
+      }
+
+      if (!role) role = 'Engineer';
+
+      var dispName = document.getElementById('v3TadaEngDisplay');
+      var dispRole = document.getElementById('v3TadaRoleDisplay');
+      if (dispName && name) dispName.textContent = name;
+      if (dispRole) dispRole.textContent = role;
+    } catch(errProf) {
+      console.error("updateTadaProfileBadge error:", errProf);
+    }
+  }
+
+  // Core function to dynamically append claim cards
+  function addV3LogRecord(type) {
+    try {
+      recordCounterV3++;
+      var container = document.getElementById('v3TadaLogsList');
+      if (!container) return;
+
+      var card = document.createElement('div');
+      var cardId = 'v3_card_' + recordCounterV3;
+      card.id = cardId;
+      card.className = 'v3-tada-log-card';
+      card.dataset.type = type;
+      card.style.cssText = 'background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; position: relative;';
+
+      var activeDate = document.getElementById('v3_tada_date')?.value || new Date().toISOString().split('T')[0];
+
+      if (type === 'Travel') {
+        card.innerHTML = '\n<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">\n<div style="display:flex; align-items:center; gap:10px;">\n<span style="font-size:11px; font-weight:700; text-transform:uppercase; padding:4px 10px; border-radius:6px; background:rgba(16,185,129,0.15); color:#10b981;">🚗 TRAVEL LOG<\/span>\n<input type="date" value="' + (activeDate) + '" class="v3-input v3-log-date" style="min-height:36px; padding:4px 10px; font-size:12px; width:auto;">\n<\/div>\n<button type="button" onclick="document.getElementById(\'' + (cardId) + '\').remove(); updateTadaTotals();" style="background:none; border:none; color:#f43f5e; font-size:12px; font-weight:600; cursor:pointer;">Remove ✕<\/button>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Method of Travel *<\/label>\n<select class="v3-input v3-travel-method" onchange="onTravelMethodChange(\'' + (cardId) + '\')" required>\n<option value="" selected disabled hidden>Select Method...<\/option>\n<option value="2 Wheeler">2 Wheeler (₹4.5 / km)<\/option>\n<option value="4 Wheeler">4 Wheeler (₹10.0 / km)<\/option>\n<option value="Public Transport">Public Transport (Custom Amount)<\/option>\n<\/select>\n<\/div>\n<div class="v3-km-wrap" style="display:none;">\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Distance in KM *<\/label>\n<input type="number" placeholder="e.g. 50" step="any" min="0" class="v3-input v3-travel-km" oninput="calcTravelAmt(\'' + (cardId) + '\')">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">\nTotal Amount (₹) * <span class="v3-rate-hint" style="font-size:10px; color:#10b981; float:right;"><\/span>\n<\/label>\n<input type="number" placeholder="₹" step="any" min="0" required class="v3-input v3-travel-amt v3-log-amount" oninput="updateTadaTotals()">\n<\/div>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Location (From - To Location) *<\/label>\n<input type="text" placeholder="e.g. Cochin to Calicut" required class="v3-input v3-travel-location">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Purpose of Visit *<\/label>\n<input type="text" placeholder="e.g. Charger PM Service" required class="v3-input v3-travel-purpose">\n<\/div>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Description / Remarks<\/label>\n<input type="text" placeholder="e.g. Toll charges / route details" class="v3-input v3-travel-desc">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Attachment(s) (Receipts / Odometer)<\/label>\n<input type="file" multiple class="v3-input v3-travel-files">\n<\/div>\n<\/div>\n';
+
+      } else if (type === 'Food') {
+        card.innerHTML = '\n<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">\n<div style="display:flex; align-items:center; gap:10px;">\n<span style="font-size:11px; font-weight:700; text-transform:uppercase; padding:4px 10px; border-radius:6px; background:rgba(245,158,11,0.15); color:#f59e0b;">🍱 FOOD LOG<\/span>\n<input type="date" value="' + (activeDate) + '" class="v3-input v3-log-date" style="min-height:36px; padding:4px 10px; font-size:12px; width:auto;">\n<\/div>\n<button type="button" onclick="document.getElementById(\'' + (cardId) + '\').remove(); updateTadaTotals();" style="background:none; border:none; color:#f43f5e; font-size:12px; font-weight:600; cursor:pointer;">Remove ✕<\/button>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Meal Option *<\/label>\n<select class="v3-input v3-food-meal" onchange="onFoodMealChange(\'' + (cardId) + '\')" required>\n<option value="" selected disabled hidden>Select Meal Option...<\/option>\n<option value="Breakfast">Breakfast (Max ₹100)<\/option>\n<option value="Lunch">Lunch (Max ₹150)<\/option>\n<option value="Dinner">Dinner (Max ₹150)<\/option>\n<option value="Other">Other (Custom Description)<\/option>\n<\/select>\n<\/div>\n<div class="v3-food-other-wrap" style="display:none;">\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Custom Food Description *<\/label>\n<input type="text" placeholder="e.g. Tea & Snacks" class="v3-input v3-food-other-desc">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">\nAmount (₹) * <span class="v3-food-cap-hint" style="font-size:10px; color:#f59e0b; float:right;"><\/span>\n<\/label>\n<input type="number" placeholder="₹" step="any" min="0" required class="v3-input v3-food-amt v3-log-amount" oninput="updateTadaTotals()">\n<\/div>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Location *<\/label>\n<input type="text" placeholder="e.g. Calicut City" required class="v3-input v3-food-location">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Description / Remarks<\/label>\n<input type="text" placeholder="e.g. Restaurant name / notes" class="v3-input v3-food-desc">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Attachment(s) (Food Bill)<\/label>\n<input type="file" multiple class="v3-input v3-food-files">\n<\/div>\n<\/div>\n';
+
+      } else if (type === 'Stay') {
+        card.innerHTML = '\n<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">\n<div style="display:flex; align-items:center; gap:10px;">\n<span style="font-size:11px; font-weight:700; text-transform:uppercase; padding:4px 10px; border-radius:6px; background:rgba(59,130,246,0.15); color:#3b82f6;">🏨 ACCOMMODATION LOG<\/span>\n<input type="date" value="' + (activeDate) + '" class="v3-input v3-log-date" style="min-height:36px; padding:4px 10px; font-size:12px; width:auto;">\n<\/div>\n<button type="button" onclick="document.getElementById(\'' + (cardId) + '\').remove(); updateTadaTotals();" style="background:none; border:none; color:#f43f5e; font-size:12px; font-weight:600; cursor:pointer;">Remove ✕<\/button>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Location *<\/label>\n<input type="text" placeholder="e.g. Calicut City" required class="v3-input v3-stay-location">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Hotel Name *<\/label>\n<input type="text" placeholder="e.g. Hotel Parkway Inn" required class="v3-input v3-stay-hotel">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Total Amount (₹) *<\/label>\n<input type="number" placeholder="₹" step="any" min="0" required class="v3-input v3-stay-amt v3-log-amount" oninput="updateTadaTotals()">\n<\/div>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Description / Remarks<\/label>\n<input type="text" placeholder="e.g. 1 Night stay for site work" class="v3-input v3-stay-desc">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Attachment(s) (Hotel Bill / Invoice)<\/label>\n<input type="file" multiple class="v3-input v3-stay-files">\n<\/div>\n<\/div>\n';
+
+      } else if (type === 'Consumable') {
+        card.innerHTML = '\n<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">\n<div style="display:flex; align-items:center; gap:10px;">\n<span style="font-size:11px; font-weight:700; text-transform:uppercase; padding:4px 10px; border-radius:6px; background:rgba(168,85,247,0.15); color:#a855f7;">🔧 CONSUMABLE LOG<\/span>\n<input type="date" value="' + (activeDate) + '" class="v3-input v3-log-date" style="min-height:36px; padding:4px 10px; font-size:12px; width:auto;">\n<\/div>\n<button type="button" onclick="document.getElementById(\'' + (cardId) + '\').remove(); updateTadaTotals();" style="background:none; border:none; color:#f43f5e; font-size:12px; font-weight:600; cursor:pointer;">Remove ✕<\/button>\n<\/div>\n\n<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Item Name / Description *<\/label>\n<input type="text" placeholder="e.g. MCB 32A / Cable ties 200mm" required class="v3-input v3-cons-item">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Cost (₹) *<\/label>\n<input type="number" placeholder="₹" step="any" min="0" required class="v3-input v3-cons-cost v3-log-amount" oninput="updateTadaTotals()">\n<\/div>\n<div>\n<label style="display:block; font-size:11px; color:#94a3b8; font-weight:600; margin-bottom:4px;">Attachment(s) (Store Receipt)<\/label>\n<input type="file" multiple class="v3-input v3-cons-files">\n<\/div>\n<\/div>\n';
+      }
+
+      container.appendChild(card);
+      updateTadaTotals();
+      return cardId;
+    } catch(errAdd) {
+      console.error("addV3LogRecord error:", errAdd);
+    }
+  }
+
+  function onTravelMethodChange(cardId) {
+    var card = document.getElementById(cardId);
+    if (!card) return;
+    var method = card.querySelector('.v3-travel-method').value;
+    var kmWrap = card.querySelector('.v3-km-wrap');
+    var kmInput = card.querySelector('.v3-travel-km');
+    var amtInput = card.querySelector('.v3-travel-amt');
+    var rateHint = card.querySelector('.v3-rate-hint');
+
+    if (method === '2 Wheeler') {
+      if (kmWrap) kmWrap.style.display = 'block';
+      if (kmInput) kmInput.required = true;
+      if (rateHint) rateHint.textContent = 'Rate: ₹4.5/km';
+      if (amtInput) amtInput.readOnly = true;
+      calcTravelAmt(cardId);
+    } else if (method === '4 Wheeler') {
+      if (kmWrap) kmWrap.style.display = 'block';
+      if (kmInput) kmInput.required = true;
+      if (rateHint) rateHint.textContent = 'Rate: ₹10.0/km';
+      if (amtInput) amtInput.readOnly = true;
+      calcTravelAmt(cardId);
+    } else if (method === 'Public Transport') {
+      if (kmWrap) kmWrap.style.display = 'none';
+      if (kmInput) kmInput.required = false;
+      if (rateHint) rateHint.textContent = 'Custom Ticket Fare';
+      if (amtInput) {
+        amtInput.readOnly = false;
+        amtInput.value = '';
+      }
+    }
+    updateTadaTotals();
+  }
+
+  function calcTravelAmt(cardId) {
+    var card = document.getElementById(cardId);
+    if (!card) return;
+    var method = card.querySelector('.v3-travel-method').value;
+    var kmInput = card.querySelector('.v3-travel-km');
+    var amtInput = card.querySelector('.v3-travel-amt');
+
+    if (!kmInput || !amtInput) return;
+    var km = parseFloat(kmInput.value) || 0;
+
+    if (method === '2 Wheeler') {
+      amtInput.value = (km * 4.5).toFixed(2);
+    } else if (method === '4 Wheeler') {
+      amtInput.value = (km * 10.0).toFixed(2);
+    }
+    updateTadaTotals();
+  }
+
+  function onFoodMealChange(cardId) {
+    var card = document.getElementById(cardId);
+    if (!card) return;
+    var meal = card.querySelector('.v3-food-meal').value;
+    var otherWrap = card.querySelector('.v3-food-other-wrap');
+    var capHint = card.querySelector('.v3-food-cap-hint');
+    var amtInput = card.querySelector('.v3-food-amt');
+
+    if (meal === 'Breakfast') {
+      if (otherWrap) otherWrap.style.display = 'none';
+      if (capHint) capHint.textContent = 'Max Cap: ₹100';
+      if (!amtInput.value || parseFloat(amtInput.value) > 100) amtInput.value = 100;
+    } else if (meal === 'Lunch') {
+      if (otherWrap) otherWrap.style.display = 'none';
+      if (capHint) capHint.textContent = 'Max Cap: ₹150';
+      if (!amtInput.value || parseFloat(amtInput.value) > 150) amtInput.value = 150;
+    } else if (meal === 'Dinner') {
+      if (otherWrap) otherWrap.style.display = 'none';
+      if (capHint) capHint.textContent = 'Max Cap: ₹150';
+      if (!amtInput.value || parseFloat(amtInput.value) > 150) amtInput.value = 150;
+    } else if (meal === 'Other') {
+      if (otherWrap) otherWrap.style.display = 'block';
+      if (capHint) capHint.textContent = 'Custom Amount';
+    }
+    updateTadaTotals();
+  }
+
+  function updateTadaTotals() {
+    var container = document.getElementById('v3TadaLogsList');
+    if (!container) return;
+
+    var travelSum = 0;
+    var foodSum = 0;
+    var staySum = 0;
+    var consSum = 0;
+
+    var cards = container.querySelectorAll('.v3-tada-log-card');
+    cards.forEach(function(card) {
+      var type = card.dataset.type;
+      if (type === 'Travel') {
+        travelSum += parseFloat(card.querySelector('.v3-travel-amt')?.value) || 0;
+      } else if (type === 'Food') {
+        foodSum += parseFloat(card.querySelector('.v3-food-amt')?.value) || 0;
+      } else if (type === 'Stay') {
+        staySum += parseFloat(card.querySelector('.v3-stay-amt')?.value) || 0;
+      } else if (type === 'Consumable') {
+        consSum += parseFloat(card.querySelector('.v3-cons-cost')?.value) || 0;
+      }
+    });
+
+    var grandSum = travelSum + foodSum + staySum + consSum;
+
+    if (document.getElementById('v3_travel_sum')) document.getElementById('v3_travel_sum').textContent = travelSum.toFixed(2);
+    if (document.getElementById('v3_food_sum')) document.getElementById('v3_food_sum').textContent = foodSum.toFixed(2);
+    if (document.getElementById('v3_stay_sum')) document.getElementById('v3_stay_sum').textContent = staySum.toFixed(2);
+    if (document.getElementById('v3_cons_sum')) document.getElementById('v3_cons_sum').textContent = consSum.toFixed(2);
+    if (document.getElementById('v3_grand_sum')) document.getElementById('v3_grand_sum').textContent = grandSum.toFixed(2);
+  }
+
+    function uploadFileToDriveAsync(file) {
+    return new Promise(function(resolve) {
+      if (!file) { resolve(''); return; }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64Data = e.target.result.split(',')[1];
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res && res.success && res.url) {
+              resolve(res.url);
+            } else {
+              console.warn("Drive upload returned unsuccessful:", res);
+              if (res && res.message) alert("Drive Upload Warning: " + res.message);
+              resolve('');
+            }
+          })
+          .withFailureHandler(function(err) {
+            console.error("Drive upload error:", err);
+            alert("Drive Upload Failure: " + err.toString());
+            resolve('');
+          })
+          .uploadMediaToDriveV3(base64Data, file.name, file.type);
+      };
+      reader.onerror = function(err) {
+        console.error("FileReader error:", err);
+        resolve('');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleV3TadaSubmit(e) {
+    e.preventDefault();
+
+    var engName = document.getElementById('v3TadaEngDisplay')?.textContent?.trim() || 'Field Engineer';
+    var engRole = document.getElementById('v3TadaRoleDisplay')?.textContent?.trim() || 'Service Engineer';
+
+    var container = document.getElementById('v3TadaLogsList');
+    var cards = container ? container.querySelectorAll('.v3-tada-log-card') : [];
+
+    if (!cards || cards.length === 0) {
+      alert("Please add at least one claim option (Travel, Food, Accommodation, or Consumable).");
+      return;
+    }
+
+    var submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.textContent = 'Uploading Attachments & Saving...';
+      submitBtn.disabled = true;
+    }
+
+    var travelLogs = [];
+    var foodLogs = [];
+    var stayLogs = [];
+    var consumableLogs = [];
+
+    var travelTotal = 0;
+    var foodTotal = 0;
+    var stayTotal = 0;
+    var consTotal = 0;
+
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      var type = card.dataset.type;
+      var dateVal = card.querySelector('.v3-log-date')?.value || new Date().toISOString().split('T')[0];
+
+      if (type === 'Travel') {
+        var method = card.querySelector('.v3-travel-method')?.value || '';
+        var km = parseFloat(card.querySelector('.v3-travel-km')?.value) || 0;
+        var amount = parseFloat(card.querySelector('.v3-travel-amt')?.value) || 0;
+        var location = card.querySelector('.v3-travel-location')?.value.trim() || '';
+        var purpose = card.querySelector('.v3-travel-purpose')?.value.trim() || '';
+        var description = card.querySelector('.v3-travel-desc')?.value.trim() || '';
+        
+        var fileInput = card.querySelector('.v3-travel-files');
+        var attachmentUrls = [];
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+          for (var f = 0; f < fileInput.files.length; f++) {
+            var url = await uploadFileToDriveAsync(fileInput.files[f]);
+            if (url) attachmentUrls.push(url);
+          }
+        }
+
+        travelLogs.push({
+          type: 'Travel',
+          date: dateVal,
+          method: method,
+          km: km,
+          amount: amount,
+          location: location,
+          purpose: purpose,
+          description: description,
+          attachmentUrl: attachmentUrls.join(', ')
+        });
+        travelTotal += amount;
+
+      } else if (type === 'Food') {
+        var meal = card.querySelector('.v3-food-meal')?.value || '';
+        var otherDesc = card.querySelector('.v3-food-other-desc')?.value.trim() || '';
+        var amount = parseFloat(card.querySelector('.v3-food-amt')?.value) || 0;
+        var location = card.querySelector('.v3-food-location')?.value.trim() || '';
+        var description = card.querySelector('.v3-food-desc')?.value.trim() || '';
+
+        var fileInput = card.querySelector('.v3-food-files');
+        var attachmentUrls = [];
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+          for (var f = 0; f < fileInput.files.length; f++) {
+            var url = await uploadFileToDriveAsync(fileInput.files[f]);
+            if (url) attachmentUrls.push(url);
+          }
+        }
+
+        foodLogs.push({
+          type: 'Food',
+          date: dateVal,
+          meal: meal,
+          otherDesc: otherDesc,
+          amount: amount,
+          location: location,
+          description: description,
+          attachmentUrl: attachmentUrls.join(', ')
+        });
+        foodTotal += amount;
+
+      } else if (type === 'Stay') {
+        var location = card.querySelector('.v3-stay-location')?.value.trim() || '';
+        var hotelName = card.querySelector('.v3-stay-hotel')?.value.trim() || '';
+        var amount = parseFloat(card.querySelector('.v3-stay-amt')?.value) || 0;
+        var description = card.querySelector('.v3-stay-desc')?.value.trim() || '';
+
+        var fileInput = card.querySelector('.v3-stay-files');
+        var attachmentUrls = [];
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+          for (var f = 0; f < fileInput.files.length; f++) {
+            var url = await uploadFileToDriveAsync(fileInput.files[f]);
+            if (url) attachmentUrls.push(url);
+          }
+        }
+
+        stayLogs.push({
+          type: 'Stay',
+          date: dateVal,
+          location: location,
+          hotelName: hotelName,
+          amount: amount,
+          description: description,
+          attachmentUrl: attachmentUrls.join(', ')
+        });
+        stayTotal += amount;
+
+      } else if (type === 'Consumable') {
+        var item = card.querySelector('.v3-cons-item')?.value.trim() || '';
+        var cost = parseFloat(card.querySelector('.v3-cons-cost')?.value) || 0;
+
+        var fileInput = card.querySelector('.v3-cons-files');
+        var attachmentUrls = [];
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+          for (var f = 0; f < fileInput.files.length; f++) {
+            var url = await uploadFileToDriveAsync(fileInput.files[f]);
+            if (url) attachmentUrls.push(url);
+          }
+        }
+
+        consumableLogs.push({
+          type: 'Consumable',
+          date: dateVal,
+          description: item,
+          amount: cost,
+          attachmentUrl: attachmentUrls.join(', ')
+        });
+        consTotal += cost;
+      }
+    }
+
+    var grandTotal = travelTotal + foodTotal + stayTotal + consTotal;
+
+    var selectedClaimDate = document.getElementById('v3_tada_date')?.value;
+    if (!selectedClaimDate && cards.length > 0) {
+      selectedClaimDate = cards[0].querySelector('.v3-log-date')?.value;
+    }
+    if (!selectedClaimDate) {
+      selectedClaimDate = new Date().toISOString().split('T')[0];
+    }
+
+    var payload = {
+      engineer: engName,
+      role: engRole,
+      claimDate: selectedClaimDate,
+      travelLogs: travelLogs,
+      foodLogs: foodLogs,
+      stayLogs: stayLogs,
+      consumableLogs: consumableLogs,
+      travelTotal: travelTotal,
+      foodTotal: foodTotal,
+      stayTotal: stayTotal,
+      consTotal: consTotal,
+      grandTotal: grandTotal,
+      timestamp: new Date().toISOString()
+    };
+
+    runAuthedV4('submitFormV3', ['tada', payload], function(res) {
+      if (submitBtn) {
+        submitBtn.textContent = 'Save Daily Claim Record';
+        submitBtn.disabled = false;
+      }
+      if (!res || !res.success) {
+        alert((res && res.message) || "Submission failed. Please try again.");
+        return;
+      }
+      showSuccessOverlayV3("Claim Saved Successfully!", "Your daily TA/DA claim record of ₹" + grandTotal.toFixed(2) + " has been recorded with proof attachments.", function() {
+        if (container) container.innerHTML = '';
+        addV3LogRecord('Travel');
+        updateTadaTotals();
+        loadV3TadaHistory();
+      });
+    }, function(err) {
+      if (submitBtn) {
+        submitBtn.textContent = 'Save Daily Claim Record';
+        submitBtn.disabled = false;
+      }
+      alert("Submission failed: " + err.toString());
+    });
+  }
+
+  function loadV3TadaHistory() {
+    var engName = document.getElementById('v3TadaEngDisplay')?.textContent?.trim() || '';
+    if (engName === 'Loading Profile...') engName = '';
+
+    var monthInput = document.getElementById('v3TadaHistoryMonth');
+    var tbody = document.getElementById('v3TadaHistoryBody');
+    if (!monthInput || !tbody) return;
+
+    if (!monthInput.value) {
+      var now = new Date();
+      var mStr = ("0" + (now.getMonth() + 1)).slice(-2);
+      monthInput.value = now.getFullYear() + "-" + mStr;
+    }
+
+    tbody.innerHTML = '<tr><td colspan="8" style="padding:20px; text-align:center; color:#94a3b8;">Loading claims for ' + monthInput.value + '...<\/td><\/tr>';
+
+    runAuthedV4('getEngineerTadaHistoryV3', [engName, monthInput.value], function(res) {
+        if (!res || !res.success || !Array.isArray(res.claims) || res.claims.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="padding:20px; text-align:center; color:#94a3b8;">No claims found for ' + monthInput.value + '<\/td><\/tr>';
+          return;
+        }
+
+        var html = '';
+        cachedDailyLogsV3 = res.claims;
+        res.claims.forEach(function(item, idx) {
+          var cleanClaimId = (item.claimId || '').replace(/'/g, "\\'");
+          var cleanDate = (item.dateStr || '').replace(/'/g, "\\'");
+
+          html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
+            '<td style="padding:10px; font-weight:700; color:#3b82f6;">' + item.claimId + '</td>' +
+            '<td style="padding:10px;">' + item.dateStr + '</td>' +
+            '<td style="padding:10px; text-align:right; color:#10b981; font-weight:600;">₹' + item.travelAmt.toFixed(2) + '</td>' +
+            '<td style="padding:10px; text-align:right; color:#f59e0b; font-weight:600;">₹' + item.foodAmt.toFixed(2) + '</td>' +
+            '<td style="padding:10px; text-align:right; color:#3b82f6; font-weight:600;">₹' + item.stayAmt.toFixed(2) + '</td>' +
+            '<td style="padding:10px; text-align:right; color:#a855f7; font-weight:600;">₹' + item.consAmt.toFixed(2) + '</td>' +
+            '<td style="padding:10px; text-align:right; font-weight:700; color:#fff;">₹' + item.dayTotal.toFixed(2) + '</td>' +
+            '<td style="padding:10px; color:#94a3b8; font-size:11px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + item.summary + '">' + item.summary + '</td>' +
+            '<td style="padding:10px; text-align:right; white-space:nowrap;">' +
+              '<button type="button" onclick="editV3TadaClaim(' + idx + ')" style="background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:#3b82f6; padding:4px 8px; border-radius:6px; font-weight:700; font-size:11px; cursor:pointer; margin-right:4px;">✏️ Edit</button>' +
+              '<button type="button" onclick="deleteV3TadaClaim(' + item.rowIndex + ', \'' + cleanClaimId + '\', \'' + cleanDate + '\')" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#ef4444; padding:4px 8px; border-radius:6px; font-weight:700; font-size:11px; cursor:pointer;">🗑️ Delete</button>' +
+            '</td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+    }, function(err) {
+      tbody.innerHTML = '<tr><td colspan="8" style="padding:20px; text-align:center; color:#f43f5e;">Failed to load claims: ' + err.toString() + '<\/td><\/tr>';
+    });
+  }
+
+  function downloadV3FortnightlyPDF() {
+    var engName = document.getElementById('v3TadaEngDisplay')?.textContent?.trim() || '';
+    if (engName === 'Loading Profile...') engName = '';
+
+    var monthInput = document.getElementById('v3PdfMonth')?.value || '';
+    var periodInput = document.getElementById('v3PdfCycle')?.value || '16-end';
+    var reportType = document.getElementById('v3PdfReportType')?.value || 'daily';
+
+    if (!monthInput) {
+      alert("Please select a Month & Year for the claim report.");
+      return;
+    }
+
+    var parts = monthInput.split('-');
+    var year = parts[0];
+    var month = parts[1];
+
+    var btn = document.getElementById('v3PdfDownloadBtn');
+    if (btn) {
+      btn.textContent = 'Compiling PDF...';
+      btn.disabled = true;
+    }
+
+    runAuthedV4('generateFortnightlyPDF', [engName, year, month, periodInput, reportType], function(res) {
+        if (btn) {
+          btn.textContent = '📥 Download PDF Report';
+          btn.disabled = false;
+        }
+        if (res && res.success && res.pdfData) {
+          var byteCharacters = atob(res.pdfData);
+          var byteNumbers = new Array(byteCharacters.length);
+          for (var i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          var byteArray = new Uint8Array(byteNumbers);
+          var blob = new Blob([byteArray], { type: 'application/pdf' });
+          var link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = res.filename || ("GOEC_TADA_Report_" + year + "_" + month + ".pdf");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          if (window.showSuccessOverlayV3) {
+            window.showSuccessOverlayV3("PDF Downloaded!", "TA/DA PDF Report generated and downloaded successfully.");
+          } else {
+            alert("PDF Report downloaded successfully!");
+          }
+        } else {
+          alert(res.error || res.message || "No claim records found for the selected period.");
+        }
+    }, function(err) {
+        if (btn) {
+          btn.textContent = '📥 Download PDF Report';
+          btn.disabled = false;
+        }
+        alert("PDF Generation Failed: " + err.toString());
+    });
+  }
+
+  function initTadaModuleV3() {
+    updateTadaProfileBadge();
+    
+    var claimDateInput = document.getElementById('v3_tada_date');
+    if (claimDateInput && !claimDateInput.value) {
+      claimDateInput.value = new Date().toISOString().split('T')[0];
+    }
+
+    var monthInput = document.getElementById('v3PdfMonth');
+    if (monthInput && !monthInput.value) {
+      var now = new Date();
+      var mStr = ("0" + (now.getMonth() + 1)).slice(-2);
+      monthInput.value = now.getFullYear() + "-" + mStr;
+    }
+    var container = document.getElementById('v3TadaLogsList');
+    if (container && container.children.length === 0) {
+      addV3LogRecord('Travel');
+    }
+    loadV3TadaHistory();
+    updateTadaTotals();
+  }
+
+  // Explicit window exports for all functions
+  window.addV3LogRecord = addV3LogRecord;
+  window.onTravelMethodChange = onTravelMethodChange;
+  window.calcTravelAmt = calcTravelAmt;
+  window.onFoodMealChange = onFoodMealChange;
+  window.updateTadaTotals = updateTadaTotals;
+  window.handleV3TadaSubmit = handleV3TadaSubmit;
+  window.loadV3TadaHistory = loadV3TadaHistory;
+  window.downloadV3FortnightlyPDF = downloadV3FortnightlyPDF;
+  window.updateTadaProfileBadge = updateTadaProfileBadge;
+  window.initTadaModuleV3 = initTadaModuleV3;
+  window.initTADAModuleV3 = initTadaModuleV3;
+
+  // Auto-initialize when DOM loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTadaModuleV3);
+  } else {
+    setTimeout(initTadaModuleV3, 50);
+  }
+
+  
+  // Fail-Safe Event Delegation for Action Buttons
+  document.addEventListener('click', function(e) {
+    var target = e.target.closest('#v3BtnAddTravel, #v3BtnAddFood, #v3BtnAddStay, #v3BtnAddCons');
+    if (target) {
+      e.preventDefault();
+      var id = target.id;
+      if (id === 'v3BtnAddTravel') addV3LogRecord('Travel');
+      else if (id === 'v3BtnAddFood') addV3LogRecord('Food');
+      else if (id === 'v3BtnAddStay') addV3LogRecord('Stay');
+      else if (id === 'v3BtnAddCons') addV3LogRecord('Consumable');
+    }
+  });
+
+  function sendResumableStreamToDriveV3(file, mimeType, inputEl, statusEl) {
+    const chunkSize = 2 * 1024 * 1024; // 2MB raw chunks
+    const totalSize = file.size;
+    const totalChunks = Math.ceil(totalSize / chunkSize);
+    const uploadId = 'up_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+
+    let currentChunk = 0;
+
+    function uploadNextChunk() {
+      const start = currentChunk * chunkSize;
+      const end = Math.min(start + chunkSize, totalSize);
+      const slice = file.slice(start, end);
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const chunkBase64 = e.target.result.split(',')[1];
+        const uploadedMB = (end / (1024 * 1024)).toFixed(1);
+        const totalMB = (totalSize / (1024 * 1024)).toFixed(1);
+        const percent = Math.round((end / totalSize) * 100);
+
+        if (statusEl) {
+          statusEl.style.color = '#00e5ff';
+          statusEl.textContent = '⏳ Streaming HD Video (' + percent + '% - ' + uploadedMB + ' / ' + totalMB + ' MB)...';
+        }
+
+        google.script.run
+          .withSuccessHandler(res => {
+            if (!res || !res.success) {
+              if (statusEl) {
+                statusEl.style.color = '#f43f5e';
+                statusEl.textContent = '✖ Upload failed: ' + (res ? res.message : 'Unknown error');
+              }
+              return;
+            }
+
+            if (res.complete) {
+              if (statusEl) {
+                statusEl.style.color = '#10b981';
+                statusEl.textContent = '✓ Media Attached (' + totalMB + ' MB HD Video)';
+              }
+              const cardEl = statusEl.closest('.v3-media-card') || statusEl.closest('.v3-form-card') || statusEl.closest('.v3-module-container') || statusEl.parentElement;
+              if (cardEl) {
+                let hiddenInput = cardEl.querySelector('.v3-media-url-input');
+                if (!hiddenInput) hiddenInput = cardEl.querySelector('input[type="hidden"]');
+                if (hiddenInput) hiddenInput.value = res.url;
+              }
+            } else {
+              currentChunk++;
+              if (currentChunk < totalChunks) {
+                uploadNextChunk();
+              }
+            }
+          })
+          .withFailureHandler(err => {
+            if (statusEl) {
+              statusEl.style.color = '#f43f5e';
+              statusEl.textContent = '✖ Streaming error: ' + err.toString();
+            }
+          })
+          .uploadChunkStreamV3(uploadId, currentChunk, totalChunks, chunkBase64, file.name, mimeType);
+      };
+
+      reader.readAsDataURL(slice);
+    }
+
+    uploadNextChunk();
+  }
+
+  function compressVideoHDV3(file, targetBitrate = 10000000) {
+    return new Promise((resolve) => {
+      if (!file || file.size <= 8 * 1024 * 1024) {
+        resolve(null);
+        return;
+      }
+
+      const video = document.createElement('video');
+      video.muted = true;
+      video.playsInline = true;
+      video.src = URL.createObjectURL(file);
+
+      video.onloadedmetadata = () => {
+        let width = video.videoWidth || 1920;
+        let height = video.videoHeight || 1080;
+        const maxDim = 1920;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        width = width - (width % 2);
+        height = height - (height % 2);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        let stream;
+        try {
+          stream = canvas.captureStream(30);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        let mimeType = 'video/mp4';
+        if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm;codecs=vp8';
+          if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = '';
+          }
+        }
+
+        const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: targetBitrate } : { videoBitsPerSecond: targetBitrate };
+        let recorder;
+        try {
+          recorder = new MediaRecorder(stream, recorderOptions);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        const chunks = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = () => {
+          const compressedBlob = new Blob(chunks, { type: mimeType || 'video/mp4' });
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target.result.split(',')[1];
+            resolve({ base64, mimeType: mimeType || 'video/mp4', size: compressedBlob.size });
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(compressedBlob);
+        };
+
+        video.playbackRate = 2.0;
+        try {
+          recorder.start(100);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        function drawFrame() {
+          if (!video.paused && !video.ended) {
+            ctx.drawImage(video, 0, 0, width, height);
+            requestAnimationFrame(drawFrame);
+          }
+        }
+
+        video.onplay = () => {
+          drawFrame();
+        };
+
+        video.onended = () => {
+          try { recorder.stop(); } catch(e){}
+        };
+
+        video.play().catch(() => resolve(null));
+      };
+
+      video.onerror = () => resolve(null);
+    });
+  }
+</script>
+
+
+<script>
+
+  var v3ActiveEditTadaClaim = null;
+
+  function editV3TadaClaim(index) {
+    if (!cachedDailyLogsV3 || !cachedDailyLogsV3[index]) return;
+    var item = cachedDailyLogsV3[index];
+    var payload = item.payload || {};
+    v3ActiveEditTadaClaim = item;
+
+    // 1. Set Claim Date
+    var dateInput = document.getElementById('v3_tada_date');
+    if (dateInput && item.claimDate) dateInput.value = item.claimDate;
+
+    // 2. Clear existing cards
+    var container = document.getElementById('v3TadaLogsList');
+    if (container) container.innerHTML = '';
+
+    // 3. Re-populate Travel Cards
+    if (payload.travelLogs && payload.travelLogs.length > 0) {
+      payload.travelLogs.forEach(function(t) {
+        var cardId = addV3LogRecord('Travel');
+        var card = document.getElementById(cardId);
+        if (card) {
+          if (t.method && card.querySelector('.v3-travel-method')) {
+            card.querySelector('.v3-travel-method').value = t.method;
+            onTravelMethodChange(cardId);
+          }
+          if (t.km && card.querySelector('.v3-travel-km')) card.querySelector('.v3-travel-km').value = t.km;
+          if (t.amount && card.querySelector('.v3-travel-amt')) card.querySelector('.v3-travel-amt').value = t.amount;
+          if (t.location && card.querySelector('.v3-travel-location')) card.querySelector('.v3-travel-location').value = t.location;
+          if (t.purpose && card.querySelector('.v3-travel-purpose')) card.querySelector('.v3-travel-purpose').value = t.purpose;
+        }
+      });
+    }
+
+    // 4. Re-populate Food Cards
+    if (payload.foodLogs && payload.foodLogs.length > 0) {
+      payload.foodLogs.forEach(function(f) {
+        var cardId = addV3LogRecord('Food');
+        var card = document.getElementById(cardId);
+        if (card) {
+          if (f.meal && card.querySelector('.v3-food-meal')) {
+            card.querySelector('.v3-food-meal').value = f.meal;
+            onFoodMealChange(cardId);
+          }
+          if (f.amount && card.querySelector('.v3-food-amt')) card.querySelector('.v3-food-amt').value = f.amount;
+          if (f.location && card.querySelector('.v3-food-location')) card.querySelector('.v3-food-location').value = f.location;
+          if (f.description && card.querySelector('.v3-food-desc')) card.querySelector('.v3-food-desc').value = f.description;
+        }
+      });
+    }
+
+    // 5. Re-populate Stay Cards
+    if (payload.stayLogs && payload.stayLogs.length > 0) {
+      payload.stayLogs.forEach(function(s) {
+        var cardId = addV3LogRecord('Stay');
+        var card = document.getElementById(cardId);
+        if (card) {
+          if (s.location && card.querySelector('.v3-stay-location')) card.querySelector('.v3-stay-location').value = s.location;
+          if (s.hotelName && card.querySelector('.v3-stay-hotel')) card.querySelector('.v3-stay-hotel').value = s.hotelName;
+          if (s.amount && card.querySelector('.v3-stay-amt')) card.querySelector('.v3-stay-amt').value = s.amount;
+        }
+      });
+    }
+
+    // 6. Re-populate Consumable Cards
+    if (payload.consumableLogs && payload.consumableLogs.length > 0) {
+      payload.consumableLogs.forEach(function(c) {
+        var cardId = addV3LogRecord('Consumable');
+        var card = document.getElementById(cardId);
+        if (card) {
+          if (c.description && card.querySelector('.v3-cons-item')) card.querySelector('.v3-cons-item').value = c.description;
+          if (c.cost && card.querySelector('.v3-cons-cost')) card.querySelector('.v3-cons-cost').value = c.cost;
+        }
+      });
+    }
+
+    updateTadaTotals();
+
+    // 7. Update UI banner and submit button
+    var submitBtn = document.getElementById('v3TadaSubmitBtn');
+    if (submitBtn) {
+      submitBtn.textContent = '💾 Update TA / DA Claim (' + item.claimId + ')';
+      submitBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+    }
+
+    var editBanner = document.getElementById('v3TadaEditBanner');
+    if (!editBanner) {
+      editBanner = document.createElement('div');
+      editBanner.id = 'v3TadaEditBanner';
+      editBanner.style.cssText = 'background:rgba(245,158,11,0.15); border:1px solid #f59e0b; padding:10px 16px; border-radius:10px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; color:#fbbf24; font-weight:700; font-size:13px;';
+      var form = document.getElementById('v3FormTada');
+      if (form) form.insertBefore(editBanner, form.firstChild);
+    }
+    editBanner.innerHTML = '<span>✏️ EDITING TA/DA CLAIM #' + item.claimId + ' (' + item.dateStr + ')</span>' +
+      '<button type="button" onclick="cancelV3TadaEdit()" style="background:#ef4444; border:none; color:#fff; padding:4px 10px; border-radius:6px; font-weight:700; cursor:pointer; font-size:11px;">✕ Cancel Edit</button>';
+    editBanner.style.display = 'flex';
+
+    var formEl = document.getElementById('v3FormTada');
+    if (formEl) formEl.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelV3TadaEdit() {
+    v3ActiveEditTadaClaim = null;
+    var dateInput = document.getElementById('v3_tada_date');
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+
+    var submitBtn = document.getElementById('v3TadaSubmitBtn');
+    if (submitBtn) {
+      submitBtn.textContent = 'Submit Consolidated TA / DA Claim';
+      submitBtn.style.background = 'linear-gradient(135deg, #00e5ff, #00b0ff)';
+    }
+    var editBanner = document.getElementById('v3TadaEditBanner');
+    if (editBanner) editBanner.style.display = 'none';
+
+    var container = document.getElementById('v3TadaLogsList');
+    if (container) container.innerHTML = '';
+    addV3LogRecord('Travel');
+    updateTadaTotals();
+  }
+
+  function deleteV3TadaClaim(rowIndex, claimId, dateStr) {
+    if (!confirm('⚠️ ARE YOU SURE YOU WANT TO DELETE THIS TA/DA CLAIM?\n\nClaim ID: ' + claimId + '\nDate: ' + dateStr + '\n\nThis action will permanently delete the claim entry from the backend Google Sheet.')) {
+      return;
+    }
+
+    var engName = document.getElementById('v3TadaEngDisplay')?.textContent?.trim() || '';
+    runAuthedV4('deleteTadaClaimV3', [rowIndex, engName, dateStr], function(res) {
+      if (res && res.success) {
+        if (window.showSuccessOverlayV3) {
+          window.showSuccessOverlayV3("Claim Deleted!", "TA/DA Claim " + claimId + " deleted successfully.");
+        } else {
+          alert("TA/DA Claim " + claimId + " deleted successfully!");
+        }
+        loadV3TadaHistory();
+      } else {
+        alert(res ? res.message : "Failed to delete claim.");
+      }
+    }, function(err) {
+      alert("Delete failed: " + err.toString());
+    });
+  }
+
+  window.editV3TadaClaim = editV3TadaClaim;
+  window.cancelV3TadaEdit = cancelV3TadaEdit;
+  window.deleteV3TadaClaim = deleteV3TadaClaim;
+
+</script>
+
+<!-- ANIMATED SUCCESS OVERLAY MODAL -->
+<div id="v3_success_overlay" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.92); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+  <style>
+    @keyframes v3ScaleUp {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .v3-success-card {
+      animation: v3ScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .v3-circle-path {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3;
+      stroke-miterlimit: 10;
+      stroke: #00e676;
+      fill: none;
+      animation: v3CircleStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    .v3-check-path {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      stroke: #00e676;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      animation: v3CheckStroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.45s forwards;
+    }
+    @keyframes v3CircleStroke {
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes v3CheckStroke {
+      100% { stroke-dashoffset: 0; }
+    }
+  </style>
+
+  <div class="v3-success-card" style="background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(0, 230, 118, 0.4); border-radius: 24px; padding: 36px 28px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(0,230,118,0.15);">
+    <div style="width: 84px; height: 84px; margin: 0 auto 20px auto; position: relative;">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="width: 100%; height: 100%;">
+        <circle class="v3-circle-path" cx="26" cy="26" r="25" />
+        <path class="v3-check-path" d="M14.1 27.2l7.1 7.2 16.8-16.8" />
+      </svg>
+    </div>
+
+    <h3 id="v3_success_overlay_title" style="font-family:'Space Grotesk', sans-serif; font-size:22px; color:#fff; margin-bottom:8px; font-weight:700;">Submission Successful!</h3>
+    <p id="v3_success_overlay_msg" style="font-size:13px; color:#94a3b8; margin-bottom:24px; line-height:1.5;">Submission recorded successfully!</p>
+
+    <button type="button" onclick="closeSuccessOverlayV3()" style="background: linear-gradient(135deg, #00e676, #00b0ff); border: none; color: #0f172a; padding: 12px 28px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(0,230,118,0.3); font-family:'Space Grotesk', sans-serif;">
+      ➕ Submit Another Response
+    </button>
+  </div>
+</div>
+
+<script>
+  let onSuccessOverlayCloseCallbackV3 = null;
+
+  function showSuccessOverlayV3(title, message, onCloseCallback) {
+    const overlay = document.getElementById('v3_success_overlay');
+    const titleEl = document.getElementById('v3_success_overlay_title') || document.getElementById('v3_success_title');
+    const msgEl = document.getElementById('v3_success_overlay_msg') || document.getElementById('v3_success_subtitle');
+
+    if (titleEl && title) titleEl.textContent = title;
+    if (msgEl && message) msgEl.textContent = message;
+
+    onSuccessOverlayCloseCallbackV3 = onCloseCallback || null;
+    window._v3OnSuccessReset = onCloseCallback || null;
+
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+  function closeSuccessOverlayV3() {
+    const overlay = document.getElementById('v3_success_overlay');
+    if (overlay) overlay.style.display = 'none';
+
+    if (typeof onSuccessOverlayCloseCallbackV3 === 'function') {
+      onSuccessOverlayCloseCallbackV3();
+      onSuccessOverlayCloseCallbackV3 = null;
+    }
+    if (typeof window._v3OnSuccessReset === 'function') {
+      window._v3OnSuccessReset();
+      window._v3OnSuccessReset = null;
+    }
+  }
+
+  window.showSuccessOverlayV3 = showSuccessOverlayV3;
+  window.closeSuccessOverlayV3 = closeSuccessOverlayV3;
+</script>

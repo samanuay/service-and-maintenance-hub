@@ -1,0 +1,21 @@
+# Clasp configuration containing private Google Apps Script deployment IDs
+.clasp.json
+
+# Environment variables & secrets
+.env
+*.key
+*.pem
+credentials.json
+client_secret*.json
+
+# Operating System & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local logs & caches
+*.log
+npm-debug.log*
+__pycache__/
+*.pyc

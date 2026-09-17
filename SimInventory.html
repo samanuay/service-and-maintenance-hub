@@ -1,0 +1,889 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; }
+  body, div, p, span, label, h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+  h1, h2, h3, .v3-form-title, .v4-form-title { font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif !important; }
+
+  .v3-input, .v4-input, input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    color: #f8fafc !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    outline: none !important;
+    width: 100%;
+    transition: all 0.2s ease;
+  }
+  .v3-input:focus, .v4-input:focus, input:focus, select:focus, textarea:focus {
+    border-color: #00e5ff !important;
+    box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2) !important;
+  }
+</style>
+
+<!-- SIM Inventory & Asset Tracking Module V3 -->
+<style>
+  .v3-sim-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--v3-panel-border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(16px);
+    margin-bottom: 24px;
+  }
+  .v3-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .v3-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .v3-badge-success { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.35); }
+  .v3-badge-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35); }
+  .v3-badge-info { background: rgba(0, 229, 255, 0.15); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.35); }
+  .v3-badge-danger { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.35); }
+  .v3-kpi-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--v3-panel-border);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .v3-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  .v3-modal-card {
+    background: #0f172a;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 20px;
+    padding: 28px;
+    width: 90%;
+    max-width: 580px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  }
+</style>
+
+<div class="v3-module-container" style="max-width: 1100px; margin: 0 auto; width: 100%;">
+
+  <!-- HEADER BAR -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+    <div>
+      <h2 style="font-family:'Space Grotesk'; font-size:24px; color:#fff; margin-bottom:4px;">📶 SIM Inventory & Asset Tracking</h2>
+      <p style="font-size:13px; color:var(--v3-text-muted);">Manage SIM cards, assign to field engineers, deploy to charger stations, and track live statuses.</p>
+    </div>
+    
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <button id="btnHODAddSim" onclick="openAddSimModalV3()" class="v3-hod-only" style="background:rgba(0,229,255,0.15); border:1px solid rgba(0,229,255,0.4); color:#00e5ff; padding:9px 18px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s ease;">
+        ➕ Add Single SIM
+      </button>
+      <button id="btnHODBulkSim" onclick="openBulkSimModalV3()" style="background:rgba(0,229,255,0.12); border:1px solid rgba(0,229,255,0.35); color:#00e5ff; padding:9px 18px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700; display:inline-flex;" class="v3-hod-only">
+        📥 Bulk Upload Excel / CSV
+      </button>
+      <button onclick="exportSimInventoryXLSXV3()" style="background:rgba(0,230,118,0.12); border:1px solid rgba(0,230,118,0.35); color:#00e676; padding:9px 18px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+        📊 Export XLSX
+      </button>
+      <button onclick="loadSimInventoryDataV3()" style="background:rgba(255,255,255,0.05); border:1px solid var(--v3-panel-border); color:#fff; padding:9px 16px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600;">
+        🔄 Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY METRICS -->
+  <div class="v3-kpi-grid">
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">TOTAL SIM CARDS</span>
+      <span id="kpi_sim_total" style="font-size:24px; font-weight:800; color:#fff; font-family:'Space Grotesk';">0</span>
+    </div>
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">DEPLOYED AT STATIONS</span>
+      <span id="kpi_sim_deployed" style="font-size:24px; font-weight:800; color:#00e676; font-family:'Space Grotesk';">0</span>
+    </div>
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">ASSIGNED TO ENGINEERS</span>
+      <span id="kpi_sim_assigned" style="font-size:24px; font-weight:800; color:#00e5ff; font-family:'Space Grotesk';">0</span>
+    </div>
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">IN STOCK / AVAILABLE</span>
+      <span id="kpi_sim_available" style="font-size:24px; font-weight:800; color:#ffb74d; font-family:'Space Grotesk';">0</span>
+    </div>
+  </div>
+
+  <!-- SEARCH & FILTER BAR -->
+  <div class="v3-sim-card" style="padding:16px 24px;">
+    <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+      <div style="flex:1; min-width:240px;">
+        <input type="text" id="v3_sim_search" onkeyup="filterSimTableV3()" placeholder="🔍 Search by SIM Number, Engineer, or Station Location..." class="v3-input" style="height:42px;">
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <select id="v3_sim_status_filter" onchange="filterSimTableV3()" class="v3-input" style="width:180px; height:42px;">
+          <option value="ALL">All Statuses</option>
+          <option value="Deployed">Deployed at Station</option>
+          <option value="Assigned">Assigned to Engineer</option>
+          <option value="Available">Available / In Stock</option>
+        </select>
+        <select id="v3_sim_eng_filter" onchange="filterSimTableV3()" class="v3-input v3-hod-only" style="width:200px; height:42px; display:block;">
+          <option value="ALL">All Engineers</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIM INVENTORY TABLE CARD -->
+  <div class="v3-sim-card">
+    <div class="v3-table-wrapper" style="overflow-x:auto;">
+      <table class="v3-table" style="width:100%; border-collapse:collapse; min-width:760px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;">SIM Number</th>
+            <th style="text-align:left;">Assigned Engineer</th>
+            <th style="text-align:left;">Station Location</th>
+            <th style="text-align:center;">Status</th>
+            <th style="text-align:left;">Remarks / Notes</th>
+            <th style="text-align:center;">Last Updated</th>
+            <th style="text-align:center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="v3SimInventoryTableBody">
+          <tr><td colspan="7" style="text-align:center; padding:30px; color:var(--v3-text-muted);">Loading SIM inventory records...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- MODAL 1: ADD / EDIT SINGLE SIM (HOD / ADMIN) -->
+<div id="v3AddSimModal" class="v3-modal-overlay">
+  <div class="v3-modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 id="v3AddSimModalTitle" style="font-family:'Space Grotesk'; font-size:18px; color:#fff;">➕ Add / Assign SIM Card</h3>
+      <button onclick="closeAddSimModalV3()" style="background:none; border:none; color:var(--v3-text-muted); font-size:20px; cursor:pointer;">✕</button>
+    </div>
+
+    <form onsubmit="handleSaveSingleSimV3(event)" style="display:flex; flex-direction:column; gap:16px;">
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">SIM CARD NUMBER *</label>
+        <input type="text" id="v3_sim_input_num" required placeholder="e.g. 89910009238472910" class="v3-input">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">ASSIGNED SERVICE ENGINEER</label>
+        <select id="v3_sim_input_eng" class="v3-input">
+          <option value="Unassigned">Unassigned (In Stock)</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">EV STATION LOCATION (If Deployed)</label>
+        <input type="text" id="v3_sim_input_loc" list="v3_sim_stations_list" placeholder="e.g. GO EC Kakkanad Substation" class="v3-input">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">STATUS *</label>
+        <select id="v3_sim_input_status" required class="v3-input">
+          <option value="Assigned">Assigned to Engineer</option>
+          <option value="Deployed">Deployed at Station</option>
+          <option value="Available">Available / In Stock</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">REMARKS / ICCID / PROVIDER NOTES</label>
+        <input type="text" id="v3_sim_input_remarks" placeholder="Enter ICCID, APN info, telecom operator, etc." class="v3-input">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+        <button type="button" onclick="closeAddSimModalV3()" style="background:rgba(255,255,255,0.05); border:1px solid var(--v3-panel-border); color:#fff; padding:10px 20px; border-radius:10px; cursor:pointer;">Cancel</button>
+        <button type="submit" id="v3SaveSimBtn" class="v3-btn" style="padding:10px 24px;">Save SIM Card</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- MODAL 2: BULK IMPORT SIM CARDS -->
+<div id="v3BulkSimModal" class="v3-modal-overlay">
+  <div class="v3-modal-card" style="max-width: 680px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="font-family:'Space Grotesk'; font-size:18px; color:#fff;">📥 Bulk Import SIM Cards (Excel / CSV)</h3>
+      <button onclick="closeBulkSimModalV3()" style="background:none; border:none; color:var(--v3-text-muted); font-size:20px; cursor:pointer;">✕</button>
+    </div>
+
+    <div style="background:rgba(0,229,255,0.05); border:1px solid rgba(0,229,255,0.2); border-radius:12px; padding:14px; margin-bottom:20px; font-size:12px; color:var(--v3-text-muted); line-height:1.5;">
+      💡 Upload a standard CSV / Excel file. Columns should include: <b>SIM Number</b>, <b>Assigned Engineer</b>, and <b>Location</b>.
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <input type="file" id="v3BulkSimFileInput" accept=".csv, .xlsx, .xls, .txt" onchange="handleBulkSimFileSelectV3(event)" class="v3-input" style="padding:10px;">
+    </div>
+
+    <div id="v3BulkSimPreviewArea" style="display:none; margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:12px; font-weight:700; color:#00e5ff;" id="v3BulkCountBadge">✓ Parsed Records</span>
+      </div>
+      <div style="max-height:220px; overflow-y:auto; border:1px solid var(--v3-panel-border); border-radius:10px;">
+        <table class="v3-table" style="width:100%; font-size:12px;">
+          <thead>
+            <tr><th>SIM Number</th><th>Engineer</th><th>Location</th><th>Remarks</th></tr>
+          </thead>
+          <tbody id="v3BulkPreviewTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px;">
+      <button type="button" onclick="closeBulkSimModalV3()" style="background:rgba(255,255,255,0.05); border:1px solid var(--v3-panel-border); color:#fff; padding:10px 20px; border-radius:10px; cursor:pointer;">Cancel</button>
+      <button type="button" id="v3ConfirmBulkBtn" onclick="confirmBulkSimImportV3()" disabled class="v3-btn" style="padding:10px 24px; opacity:0.5;">🚀 Import All SIMs</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL 3: ENGINEER DEPLOY & EDIT REMARKS -->
+<div id="v3DeploySimModal" class="v3-modal-overlay">
+  <div class="v3-modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="font-family:'Space Grotesk'; font-size:18px; color:#fff;">📍 Deploy SIM & Edit Remarks</h3>
+      <button onclick="closeDeploySimModalV3()" style="background:none; border:none; color:var(--v3-text-muted); font-size:20px; cursor:pointer;">✕</button>
+    </div>
+
+    <form onsubmit="handleSaveSimDeploymentV3(event)" style="display:flex; flex-direction:column; gap:16px;">
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">SIM CARD NUMBER</label>
+        <input type="text" id="v3_deploy_sim_num" readonly class="v3-input" style="background:rgba(255,255,255,0.05); color:var(--v3-cyan); font-weight:700;">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">DEPLOY TO EV STATION LOCATION *</label>
+        <input type="text" id="v3_deploy_loc" list="v3_sim_stations_list" required placeholder="e.g. GO EC Aluva Innate / KSEB Substation" class="v3-input">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">STATUS *</label>
+        <select id="v3_deploy_status" required class="v3-input">
+          <option value="Deployed" selected>Deployed at Station</option>
+          <option value="Assigned">Assigned (In Hand)</option>
+          <option value="Available">Available / Returned</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--v3-text-muted); margin-bottom:6px;">REMARKS / FIELD NOTES</label>
+        <textarea id="v3_deploy_remarks" placeholder="Enter IP address, ICCID, provider notes, or site observations..." class="v3-input" style="min-height:80px;"></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+        <button type="button" onclick="closeDeploySimModalV3()" style="background:rgba(255,255,255,0.05); border:1px solid var(--v3-panel-border); color:#fff; padding:10px 20px; border-radius:10px; cursor:pointer;">Cancel</button>
+        <button type="submit" id="v3SaveDeployBtn" class="v3-btn" style="padding:10px 24px;">Update SIM Status</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Datalist for Dynamic Autocomplete Suggestions (Linked to Charger Inventory) -->
+<datalist id="v3_sim_stations_list"></datalist>
+
+<script>
+  let rawSimInventoryDataV3 = [];
+  let parsedBulkSimRowsV3 = [];
+
+  function checkIsHODOrAdminV3(user) {
+    if (!user) return false;
+    const r = (user.role || '').toString().toLowerCase();
+    if (!r) return false;
+    return r.indexOf('hod') !== -1 || r.indexOf('head') !== -1 || r.indexOf('admin') !== -1 || r.indexOf('supervisor') !== -1;
+  }
+
+  function initSimInventoryModuleV3() {
+    // This page's DOM is cached and re-shown (not recreated) on every visit
+    // to this tab - reset any modal left open from a previous visit.
+    ['v3AddSimModal', 'v3BulkSimModal', 'v3DeploySimModal'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    try {
+      const user = window.currentUserV3;
+      const isHODOrAdmin = checkIsHODOrAdminV3(user);
+
+      const hodElements = document.querySelectorAll('.v3-hod-only');
+      hodElements.forEach(el => {
+        if (isHODOrAdmin) {
+          if (el.tagName === 'SELECT' || el.tagName === 'LI') {
+            el.style.display = 'block';
+          } else {
+            el.style.display = 'inline-flex';
+          }
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    } catch(e) {
+      console.log("UI toggle notice: ", e);
+    }
+
+    loadSimInventoryDataV3();
+  }
+
+  function loadSimInventoryDataV3() {
+    const tbody = document.getElementById('v3SimInventoryTableBody');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#00e5ff;">⏳ Fetching SIM inventory from Google Sheets...</td></tr>';
+    }
+
+    const user = window.currentUserV3;
+    const role = user ? user.role : 'HOD';
+    const engName = user ? (user.fullName || user.username) : '';
+
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      runAuthedV4('getSimInventoryDataV3', [role, engName], res => {
+          if (!res || !res.success) {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:#f43f5e; text-align:center;">Error: ' + (res ? res.message : 'Failed to load') + '</td></tr>';
+            return;
+          }
+
+          rawSimInventoryDataV3 = res.items || [];
+          populateEngineerDropdownsV3(res.engineers || []);
+          populateStationsDatalistV3(res.stations || []);
+          updateSimKpiSummaryV3(rawSimInventoryDataV3);
+          renderSimTableV3();
+      }, err => {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:#f43f5e; text-align:center;">Error loading SIMs: ' + (err.toString()) + '</td></tr>';
+      });
+    } else {
+      rawSimInventoryDataV3 = [];
+      updateSimKpiSummaryV3([]);
+      renderSimTableV3();
+    }
+  }
+
+  function populateEngineerDropdownsV3(engineers) {
+    const engList = Array.isArray(engineers) ? engineers : ((engineers && Array.isArray(engineers.engineers)) ? engineers.engineers : []);
+    const inputEng = document.getElementById('v3_sim_input_eng');
+    const filterEng = document.getElementById('v3_sim_eng_filter');
+
+    if (inputEng) {
+      inputEng.innerHTML = '<option value="Unassigned">Unassigned (In Stock)</option>';
+      engList.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e; opt.textContent = e; inputEng.appendChild(opt);
+      });
+    }
+
+    if (filterEng) {
+      filterEng.innerHTML = '<option value="ALL">All Engineers</option>';
+      engList.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e; opt.textContent = e; filterEng.appendChild(opt);
+      });
+    }
+  }
+
+  function populateStationsDatalistV3(stations) {
+    const list = document.getElementById('v3_sim_stations_list');
+    if (!list) return;
+    list.innerHTML = '';
+    const stationsList = Array.isArray(stations) ? stations : [];
+    stationsList.forEach(st => {
+      const name = st.locationName || st.stationName || '';
+      if (name) {
+        const option = document.createElement('option');
+        option.value = name;
+        list.appendChild(option);
+      }
+    });
+  }
+
+  function updateSimKpiSummaryV3(items) {
+    const totalEl = document.getElementById('kpi_sim_total');
+    const depEl = document.getElementById('kpi_sim_deployed');
+    const assEl = document.getElementById('kpi_sim_assigned');
+    const availEl = document.getElementById('kpi_sim_available');
+
+    if (totalEl) totalEl.textContent = items.length;
+    const deployed = items.filter(i => i.status === 'Deployed' || (i.location && i.location !== 'In Stock / Warehouse')).length;
+    const assigned = items.filter(i => i.status === 'Assigned' || (i.engineer && i.engineer !== 'Unassigned')).length;
+    const available = items.filter(i => i.status === 'Available' || i.engineer === 'Unassigned').length;
+
+    if (depEl) depEl.textContent = deployed;
+    if (assEl) assEl.textContent = assigned;
+    if (availEl) availEl.textContent = available;
+  }
+
+  function filterSimTableV3() {
+    renderSimTableV3();
+  }
+
+  function renderSimTableV3() {
+    const tbody = document.getElementById('v3SimInventoryTableBody');
+    if (!tbody) return;
+
+    const searchInput = document.getElementById('v3_sim_search');
+    const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    const statusFilterEl = document.getElementById('v3_sim_status_filter');
+    const statusFilter = statusFilterEl ? statusFilterEl.value : 'ALL';
+
+    const engFilterEl = document.getElementById('v3_sim_eng_filter');
+    const engFilter = engFilterEl ? engFilterEl.value : 'ALL';
+
+    const user = window.currentUserV3;
+    const isHODOrAdmin = checkIsHODOrAdminV3(user);
+    const loggedEngName = user ? (user.fullName || user.username || '') : '';
+
+    let filtered = rawSimInventoryDataV3;
+
+    if (!isHODOrAdmin && loggedEngName) {
+      const targetEng = loggedEngName.toLowerCase().trim();
+      const targetFirst = targetEng.split(' ')[0];
+      filtered = filtered.filter(i => {
+        if (!i.engineer) return false;
+        const eLow = i.engineer.toLowerCase().trim();
+        const eFirst = eLow.split(' ')[0];
+        return eLow === targetEng || eLow.includes(targetEng) || targetEng.includes(eLow) || (eFirst.length >= 3 && eFirst === targetFirst);
+      });
+    }
+
+    updateSimKpiSummaryV3(filtered);
+
+    if (statusFilter !== 'ALL') {
+      filtered = filtered.filter(i => i.status === statusFilter);
+    }
+    if (engFilter !== 'ALL') {
+      filtered = filtered.filter(i => i.engineer === engFilter);
+    }
+    if (search) {
+      filtered = filtered.filter(i => 
+        (i.simNumber && i.simNumber.toLowerCase().includes(search)) ||
+        (i.engineer && i.engineer.toLowerCase().includes(search)) ||
+        (i.location && i.location.toLowerCase().includes(search)) ||
+        (i.remarks && i.remarks.toLowerCase().includes(search))
+      );
+    }
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--v3-text-muted);">No SIM card records found.</td></tr>';
+      return;
+    }
+
+    let html = '';
+    filtered.forEach(item => {
+      let badgeClass = 'v3-badge-warning';
+      if (item.status === 'Deployed') badgeClass = 'v3-badge-success';
+      else if (item.status === 'Assigned') badgeClass = 'v3-badge-info';
+
+      const actionBtn = isHODOrAdmin 
+        ? '<button onclick="editSimRecordV3(\'' + item.simNumber + '\')" style="background:rgba(0,229,255,0.12); border:1px solid rgba(0,229,255,0.3); color:#00e5ff; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">✏️ Edit</button>'
+        : '<button onclick="openDeploySimModalV3(\'' + item.simNumber + '\', \'' + (item.location || '') + '\', \'' + (item.remarks || '').replace(/'/g, "\\'") + '\')" style="background:rgba(0,230,118,0.12); border:1px solid rgba(0,230,118,0.3); color:#00e676; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">📍 Deploy / Notes</button>';
+
+      html += '<tr>' +
+        '<td style="font-weight:700; color:var(--v3-cyan);">' + (item.simNumber) + '</td>' +
+        '<td style="font-weight:600;">' + (item.engineer) + '</td>' +
+        '<td>' + (item.location || 'In Stock / Warehouse') + '</td>' +
+        '<td style="text-align:center;"><span class="v3-badge ' + (badgeClass) + '">' + (item.status) + '</span></td>' +
+        '<td style="font-size:12px; color:#cbd5e1;">' + (item.remarks || '-') + '</td>' +
+        '<td style="text-align:center; font-size:11px; color:var(--v3-text-muted);">' + (item.dateUpdated || '-') + '</td>' +
+        '<td style="text-align:center;">' + actionBtn + '</td>' +
+      '</tr>';
+    });
+
+    tbody.innerHTML = html;
+  }
+
+  // --- MODAL HANDLERS ---
+  function openAddSimModalV3() {
+    const title = document.getElementById('v3AddSimModalTitle');
+    if (title) title.textContent = '➕ Add / Assign SIM Card';
+    const inputNum = document.getElementById('v3_sim_input_num');
+    if (inputNum) {
+      inputNum.value = '';
+      inputNum.removeAttribute('readonly');
+    }
+    const inputEng = document.getElementById('v3_sim_input_eng');
+    if (inputEng) inputEng.value = 'Unassigned';
+    const inputLoc = document.getElementById('v3_sim_input_loc');
+    if (inputLoc) inputLoc.value = '';
+    const inputStatus = document.getElementById('v3_sim_input_status');
+    if (inputStatus) inputStatus.value = 'Assigned';
+    const inputRemarks = document.getElementById('v3_sim_input_remarks');
+    if (inputRemarks) inputRemarks.value = '';
+
+    const modal = document.getElementById('v3AddSimModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function editSimRecordV3(simNum) {
+    const item = rawSimInventoryDataV3.find(i => i.simNumber === simNum);
+    if (!item) return;
+
+    const title = document.getElementById('v3AddSimModalTitle');
+    if (title) title.textContent = '✏️ Edit SIM #' + simNum;
+
+    const inputNum = document.getElementById('v3_sim_input_num');
+    if (inputNum) {
+      inputNum.value = item.simNumber;
+      inputNum.setAttribute('readonly', 'readonly');
+    }
+    const inputEng = document.getElementById('v3_sim_input_eng');
+    if (inputEng) inputEng.value = item.engineer || 'Unassigned';
+    const inputLoc = document.getElementById('v3_sim_input_loc');
+    if (inputLoc) inputLoc.value = item.location || '';
+    const inputStatus = document.getElementById('v3_sim_input_status');
+    if (inputStatus) inputStatus.value = item.status || 'Assigned';
+    const inputRemarks = document.getElementById('v3_sim_input_remarks');
+    if (inputRemarks) inputRemarks.value = item.remarks || '';
+
+    const modal = document.getElementById('v3AddSimModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeAddSimModalV3() {
+    const modal = document.getElementById('v3AddSimModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function handleSaveSingleSimV3(e) {
+    e.preventDefault();
+    const num = document.getElementById('v3_sim_input_num').value.trim();
+    const eng = document.getElementById('v3_sim_input_eng').value;
+    const loc = document.getElementById('v3_sim_input_loc').value.trim();
+    const status = document.getElementById('v3_sim_input_status').value;
+    const remarks = document.getElementById('v3_sim_input_remarks').value.trim();
+
+    const btn = document.getElementById('v3SaveSimBtn');
+    if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
+
+    runAuthedV4('addSingleSimV3', [num, eng, loc, status, remarks], res => {
+      if (btn) { btn.textContent = 'Save SIM Card'; btn.disabled = false; }
+      alert(res.message);
+      if (res.success) {
+        closeAddSimModalV3();
+        loadSimInventoryDataV3();
+      }
+    }, err => {
+      if (btn) { btn.textContent = 'Save SIM Card'; btn.disabled = false; }
+      alert('Error: ' + err.toString());
+    });
+  }
+
+  // --- BULK IMPORT PARSER ---
+  function openBulkSimModalV3() {
+    parsedBulkSimRowsV3 = [];
+    const fileInput = document.getElementById('v3BulkSimFileInput');
+    if (fileInput) fileInput.value = '';
+    const previewArea = document.getElementById('v3BulkSimPreviewArea');
+    if (previewArea) previewArea.style.display = 'none';
+
+    const confirmBtn = document.getElementById('v3ConfirmBulkBtn');
+    if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = '0.5'; }
+
+    const modal = document.getElementById('v3BulkSimModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeBulkSimModalV3() {
+    const modal = document.getElementById('v3BulkSimModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function handleBulkSimFileSelectV3(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const dataStr = evt.target.result;
+      const rows = parseCSVOrTextDataV3(dataStr);
+
+      if (rows.length === 0) {
+        alert("Could not parse any valid SIM rows from file. Please ensure columns include 'SIM Number' and 'Assigned Engineer'.");
+        return;
+      }
+
+      parsedBulkSimRowsV3 = rows;
+      renderBulkPreviewTableV3(rows);
+    };
+
+    reader.readAsText(file);
+  }
+
+  function parseCSVOrTextDataV3(text) {
+    const lines = text.split(/\r\n|\n/);
+    if (lines.length <= 1) return [];
+
+    const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+    
+    let colSim = headers.findIndex(h => h.includes('sim'));
+    if (colSim === -1) colSim = 0;
+    
+    let colEng = headers.findIndex(h => h.includes('eng') || h.includes('assigned') || h.includes('name'));
+    if (colEng === -1) colEng = 1;
+
+    let colLoc = headers.findIndex(h => h.includes('location') || h.includes('station'));
+    if (colLoc === -1) colLoc = 2;
+
+    let colRem = headers.findIndex(h => h.includes('remark') || h.includes('note'));
+
+    const parsed = [];
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      const cols = lines[i].split(',').map(c => c.replace(/^["']|["']$/g, '').trim());
+      
+      const simNum = cols[colSim] || '';
+      if (!simNum) continue;
+
+      const eng = cols[colEng] || 'Unassigned';
+      const loc = (colLoc !== -1 && cols[colLoc]) ? cols[colLoc] : 'In Stock / Warehouse';
+      const remarks = (colRem !== -1 && cols[colRem]) ? cols[colRem] : 'Bulk Uploaded';
+
+      parsed.push({
+        simNumber: simNum,
+        engineer: eng,
+        location: loc,
+        status: (loc && loc !== 'In Stock / Warehouse') ? 'Deployed' : 'Assigned',
+        remarks: remarks
+      });
+    }
+
+    return parsed;
+  }
+
+  function renderBulkPreviewTableV3(rows) {
+    const previewArea = document.getElementById('v3BulkSimPreviewArea');
+    const badge = document.getElementById('v3BulkCountBadge');
+    const tbody = document.getElementById('v3BulkPreviewTbody');
+    const confirmBtn = document.getElementById('v3ConfirmBulkBtn');
+
+    if (badge) badge.textContent = '✓ Parsed ' + (rows.length) + ' SIM Records';
+    if (previewArea) previewArea.style.display = 'block';
+
+    let html = '';
+    rows.slice(0, 10).forEach(r => {
+      html += '<tr><td>' + (r.simNumber) + '</td><td>' + (r.engineer) + '</td><td>' + (r.location) + '</td><td>' + (r.remarks) + '</td></tr>';
+    });
+    if (tbody) tbody.innerHTML = html;
+
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.style.opacity = '1';
+    }
+  }
+
+  function confirmBulkSimImportV3() {
+    if (parsedBulkSimRowsV3.length === 0) return;
+
+    const btn = document.getElementById('v3ConfirmBulkBtn');
+    if (btn) { btn.textContent = 'Importing...'; btn.disabled = true; }
+
+    runAuthedV4('bulkImportSimsV3', [parsedBulkSimRowsV3], res => {
+      if (btn) { btn.textContent = '🚀 Import All SIMs'; btn.disabled = false; }
+      alert(res.message);
+      if (res.success) {
+        closeBulkSimModalV3();
+        loadSimInventoryDataV3();
+      }
+    }, err => {
+      if (btn) { btn.textContent = '🚀 Import All SIMs'; btn.disabled = false; }
+      alert('Bulk import error: ' + err.toString());
+    });
+  }
+
+  // --- ENGINEER DEPLOY MODAL ---
+  function openDeploySimModalV3(simNum, currentLoc, currentRemarks) {
+    const simNumInput = document.getElementById('v3_deploy_sim_num');
+    if (simNumInput) simNumInput.value = simNum;
+    const locInput = document.getElementById('v3_deploy_loc');
+    if (locInput) locInput.value = currentLoc || '';
+    const statusSelect = document.getElementById('v3_deploy_status');
+    if (statusSelect) statusSelect.value = currentLoc ? 'Deployed' : 'Assigned';
+    const remarksInput = document.getElementById('v3_deploy_remarks');
+    if (remarksInput) remarksInput.value = currentRemarks || '';
+
+    const modal = document.getElementById('v3DeploySimModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeDeploySimModalV3() {
+    const modal = document.getElementById('v3DeploySimModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function handleSaveSimDeploymentV3(e) {
+    e.preventDefault();
+    const simNum = document.getElementById('v3_deploy_sim_num').value;
+    const loc = document.getElementById('v3_deploy_loc').value.trim();
+    const status = document.getElementById('v3_deploy_status').value;
+    const remarks = document.getElementById('v3_deploy_remarks').value.trim();
+
+    const btn = document.getElementById('v3SaveDeployBtn');
+    if (btn) { btn.textContent = 'Updating...'; btn.disabled = true; }
+
+    runAuthedV4('updateSimDeploymentV3', [simNum, loc, remarks, status], res => {
+      if (btn) { btn.textContent = 'Update SIM Status'; btn.disabled = false; }
+      alert(res.message);
+      if (res.success) {
+        closeDeploySimModalV3();
+        loadSimInventoryDataV3();
+      }
+    }, err => {
+      if (btn) { btn.textContent = 'Update SIM Status'; btn.disabled = false; }
+      alert('Error: ' + err.toString());
+    });
+  }
+
+  // --- EXPORT XLSX ---
+  function exportSimInventoryXLSXV3() {
+    if (!rawSimInventoryDataV3 || rawSimInventoryDataV3.length === 0) {
+      alert("No SIM inventory records available to export.");
+      return;
+    }
+
+    const headers = ["SIM Number", "Assigned Engineer", "Station Location", "Status", "Remarks", "Date Updated"];
+    const rows = rawSimInventoryDataV3.map(i => [
+      '"' + ((i.simNumber || '').replace(/"/g, '""')) + '"',
+      '"' + ((i.engineer || '').replace(/"/g, '""')) + '"',
+      '"' + ((i.location || '').replace(/"/g, '""')) + '"',
+      '"' + ((i.status || '').replace(/"/g, '""')) + '"',
+      '"' + ((i.remarks || '').replace(/"/g, '""')) + '"',
+      '"' + ((i.dateUpdated || '').replace(/"/g, '""')) + '"'
+    ]);
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", 'GOEC_SIM_Inventory_' + (new Date().toISOString().split('T')[0]) + '.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function compressVideoHDV3(file, targetBitrate = 10000000) {
+    return new Promise((resolve) => {
+      if (!file || file.size <= 8 * 1024 * 1024) {
+        resolve(null);
+        return;
+      }
+
+      const video = document.createElement('video');
+      video.muted = true;
+      video.playsInline = true;
+      video.src = URL.createObjectURL(file);
+
+      video.onloadedmetadata = () => {
+        let width = video.videoWidth || 1920;
+        let height = video.videoHeight || 1080;
+        const maxDim = 1920;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        width = width - (width % 2);
+        height = height - (height % 2);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        let stream;
+        try {
+          stream = canvas.captureStream(30);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        let mimeType = 'video/mp4';
+        if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm;codecs=vp8';
+          if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = '';
+          }
+        }
+
+        const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: targetBitrate } : { videoBitsPerSecond: targetBitrate };
+        let recorder;
+        try {
+          recorder = new MediaRecorder(stream, recorderOptions);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        const chunks = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = () => {
+          const compressedBlob = new Blob(chunks, { type: mimeType || 'video/mp4' });
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target.result.split(',')[1];
+            resolve({ base64, mimeType: mimeType || 'video/mp4', size: compressedBlob.size });
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(compressedBlob);
+        };
+
+        video.playbackRate = 2.0;
+        try {
+          recorder.start(100);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        function drawFrame() {
+          if (!video.paused && !video.ended) {
+            ctx.drawImage(video, 0, 0, width, height);
+            requestAnimationFrame(drawFrame);
+          }
+        }
+
+        video.onplay = () => {
+          drawFrame();
+        };
+
+        video.onended = () => {
+          try { recorder.stop(); } catch(e){}
+        };
+
+        video.play().catch(() => resolve(null));
+      };
+
+      video.onerror = () => resolve(null);
+    });
+  }
+</script>

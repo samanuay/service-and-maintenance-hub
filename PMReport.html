@@ -1,0 +1,1048 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; }
+  body, div, p, span, label, h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+  h1, h2, h3, .v3-form-title, .v4-form-title { font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif !important; }
+
+  .v3-input, .v4-input, input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    color: #f8fafc !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    outline: none !important;
+    width: 100%;
+    transition: all 0.2s ease;
+  }
+  .v3-input:focus, .v4-input:focus, input:focus, select:focus, textarea:focus {
+    border-color: #00e5ff !important;
+    box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2) !important;
+  }
+</style>
+
+<!-- PM Report &amp; Audit Module V3 -->
+<style>
+  .v3-report-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--v3-panel-border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(16px);
+    margin-bottom: 24px;
+  }
+  .v3-pm-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .v3-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .v3-badge-success { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.35); }
+  .v3-badge-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35); }
+  .v3-badge-info { background: rgba(0, 229, 255, 0.15); color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.35); }
+  .v3-badge-danger { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.35); }
+  .v3-pm-section-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--v3-panel-border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .v3-pm-grid-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .v3-pm-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .v3-pm-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .v3-pm-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    word-break: break-word;
+  }
+  .v3-kpi-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--v3-panel-border, rgba(255, 255, 255, 0.08));
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    backdrop-filter: blur(12px);
+  }
+  .v3-btn-view {
+    white-space: nowrap !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    color: #fff !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .v3-btn-view:hover {
+    background: rgba(0, 229, 255, 0.15) !important;
+    border-color: rgba(0, 229, 255, 0.4) !important;
+    color: #00e5ff !important;
+    transform: translateY(-1px);
+  }
+  .v3-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  .v3-report-modal-card {
+    background: #0f172a;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 20px;
+    padding: 28px;
+    width: 95%;
+    max-width: 950px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+  }
+</style>
+
+<div class="v3-module-container" style="max-width: 1150px; margin: 0 auto; width: 100%;">
+
+  <!-- HEADER BAR -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+    <div>
+      <h2 style="font-family:'Space Grotesk'; font-size:24px; color:#fff; margin-bottom:4px;">📋 Station PM Reports &amp; Audit Logs</h2>
+      <p style="font-size:13px; color:var(--v3-text-muted);">View completed Preventive Maintenance reports for Civil &amp; Charger, verify PM submissions, and dispatch custom email reports.</p>
+    </div>
+    
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <button onclick="loadPMReportOverviewV3(getSelectedPMMonthStrV3(), false)" style="background:rgba(0,229,255,0.12); border:1px solid rgba(0,229,255,0.35); color:#00e5ff; padding:9px 18px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+        🔄 Refresh Reports
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY METRICS -->
+  <div class="v3-pm-kpi-grid">
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">TOTAL STATIONS</span>
+      <span id="kpi_pm_total_stations" style="font-size:24px; font-weight:800; color:#fff; font-family:'Space Grotesk';">0</span>
+    </div>
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">VERIFIED PMS</span>
+      <span id="kpi_pm_verified" style="font-size:24px; font-weight:800; color:#00e676; font-family:'Space Grotesk';">0</span>
+    </div>
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">PENDING VERIFICATION</span>
+      <span id="kpi_pm_pending_verif" style="font-size:24px; font-weight:800; color:#ffb74d; font-family:'Space Grotesk';">0</span>
+    </div>
+    <div class="v3-kpi-card">
+      <span style="font-size:11px; font-weight:600; color:var(--v3-text-muted); text-transform:uppercase;">COMPLETED THIS MONTH</span>
+      <span id="kpi_pm_this_month" style="font-size:24px; font-weight:800; color:#00e5ff; font-family:'Space Grotesk';">0</span>
+    </div>
+  </div>
+
+  <!-- SEARCH &amp; FILTER BAR -->
+  <div class="v3-report-card" style="padding:16px 24px;">
+    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+      <div style="flex:1; min-width:220px;">
+        <input type="text" id="v3_pm_report_search" onkeyup="filterPMReportTableV3()" placeholder="🔍 Search by Station Name, ID or Engineer..." class="v3-input" style="height:42px;">
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <select id="v3_pm_engineer_filter" onchange="filterPMReportTableV3()" class="v3-input" style="width:170px; height:42px; font-size:12px;">
+          <option value="">All Engineers</option>
+        </select>
+        <select id="v3_pm_sort_filter" onchange="filterPMReportTableV3()" class="v3-input" style="width:215px; height:42px; font-size:12px;">
+          <option value="due_asc" selected>Sort: PM Due Date (Overdue First)</option>
+          <option value="due_desc">Sort: PM Due Date (Latest First)</option>
+          <option value="name">Sort: Station Name (A-Z)</option>
+        </select>
+        <select id="v3_pm_status_filter" onchange="filterPMReportTableV3()" class="v3-input" style="width:180px; height:42px; font-size:12px;">
+          <option value="ALL">All Verification Statuses</option>
+          <option value="Verified">Verified ✅</option>
+          <option value="Pending">Pending Verification ⏳</option>
+        </select>
+        <select id="v3_pm_month_filter" onchange="handlePMMonthYearChangeV3()" class="v3-input" style="width:130px; height:42px; font-size:12px;">
+          <option value="">All Months</option>
+        </select>
+        <select id="v3_pm_year_filter" onchange="handlePMMonthYearChangeV3()" class="v3-input" style="width:100px; height:42px; font-size:12px;">
+          <option value="">All Years</option>
+        </select>
+      </div>
+    </div>
+    <p style="font-size:11px; color:var(--v3-text-muted); margin:10px 0 0 0;">Month/Year re-checks every station against that specific period's own PM submissions, so a station serviced again in a later month still shows up for the month you picked.</p>
+  </div>
+
+  <!-- STATIONS PM TABLE -->
+  <div class="v3-report-card">
+    <div class="v3-table-wrapper" style="overflow-x:auto;">
+      <table class="v3-table" style="width:100%; border-collapse:collapse; min-width:850px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Station Name</th>
+            <th style="text-align:left;">Assigned Engineer</th>
+            <th style="text-align:center;">Last PM Completed Date</th>
+            <th style="text-align:center;">Next PM Due Date</th>
+            <th style="text-align:center;">Verification Status</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="v3PMReportTableBody">
+          <tr><td colspan="6" style="text-align:center; padding:30px; color:#00e5ff;">⏳ Loading Station PM Audit records...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- MODAL 1: COMBINED STATION PM REPORT VIEWER -->
+<div id="v3PMReportModal" class="v3-modal-overlay">
+  <div class="v3-report-modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.1);">
+      <div>
+        <h3 id="v3PMReportModalStationTitle" style="font-family:'Space Grotesk'; font-size:22px; color:#fff; margin-bottom:4px;">Station PM Audit Report</h3>
+        <p id="v3PMReportModalSub" style="font-size:13px; color:var(--v3-text-muted);">Inspection details for Civil &amp; Electrical + Charger Maintenance</p>
+      </div>
+      <button onclick="closePMReportModalV3()" style="background:rgba(255,255,255,0.08); border:none; color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;">✕</button>
+    </div>
+
+    <!-- REPORT BODY CONTENT -->
+    <div id="v3PMReportModalContent">
+      <div style="text-align:center; padding:40px; color:#00e5ff;">Fetching complete PM report data...</div>
+    </div>
+
+    <!-- BOTTOM ACTION BAR -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1); flex-wrap:wrap; gap:12px;">
+      <div id="v3PMVerificationBadgeContainer">
+        <!-- Verification badge populated dynamically -->
+      </div>
+      
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button id="btnVerifyPM" onclick="handleVerifyCurrentPMV3()" style="background:rgba(0,230,118,0.15); border:1px solid rgba(0,230,118,0.4); color:#00e676; padding:10px 20px; border-radius:10px; font-weight:700; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+          ✅ Mark PM as Verified
+        </button>
+        <button onclick="openEmailCustomizerModalV3()" style="background:rgba(0,229,255,0.15); border:1px solid rgba(0,229,255,0.4); color:#00e5ff; padding:10px 20px; border-radius:10px; font-weight:700; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+          📧 Send PM Report Email
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL 2: EMAIL CUSTOMIZER &amp; DISPATCHER -->
+<div id="v3PMEmailModal" class="v3-modal-overlay">
+  <div class="v3-report-modal-card" style="max-width: 650px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1);">
+      <h3 style="font-family:'Space Grotesk'; font-size:19px; color:#fff;">📧 Custom Email PM Report</h3>
+      <button onclick="closePMEmailModalV3()" style="background:none; border:none; color:var(--v3-text-muted); font-size:20px; cursor:pointer;">✕</button>
+    </div>
+
+    <form onsubmit="handleSendPMEmailV3(event)" style="display:flex; flex-direction:column; gap:16px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:700; color:var(--v3-text-muted); margin-bottom:6px;">RECIPIENT NAME *</label>
+          <input type="text" id="v3_email_recipient_name" required placeholder="e.g. Operations Manager" class="v3-input">
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:700; color:var(--v3-text-muted); margin-bottom:6px;">RECIPIENT EMAIL ADDRESS(ES) *</label>
+          <input type="email" multiple id="v3_email_recipient_email" required placeholder="e.g. client@example.com, operations@example.com" class="v3-input">
+        </div>
+      </div>
+      <div id="v3EmailNoInvestorHint" style="display:none; font-size:12px; color:#fbbf24; background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.25); border-radius:8px; padding:10px 12px;">
+        No investor email is on file for this station yet. <a href="#" onclick="switchTabV4('stations'); return false;" style="color:#fbbf24; text-decoration:underline;">Set one in Stations</a> so future PM reports can pre-fill automatically.
+      </div>
+
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label style="font-size:11px; font-weight:700; color:var(--v3-text-muted);">CUSTOMIZE INCLUDED EMAIL REPORT POINTS</label>
+          <div style="display:flex; gap:8px;">
+            <button type="button" onclick="toggleAllEmailPointsV3(true)" style="background:rgba(0,229,255,0.12); border:1px solid rgba(0,229,255,0.3); color:#00e5ff; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer;">Select All</button>
+            <button type="button" onclick="toggleAllEmailPointsV3(false)" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1; padding:3px 8px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer;">Deselect All</button>
+          </div>
+        </div>
+
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--v3-panel-border, rgba(255,255,255,0.1)); border-radius:12px; padding:14px; max-height:280px; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="grid-column: span 2; font-size:11px; font-weight:700; color:#00e5ff; border-bottom:1px solid rgba(0,229,255,0.2); padding-bottom:4px; margin-bottom:2px;">Station Overview &amp; Electrical/Civil Points</div>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="exec_summary" checked style="accent-color:#00e5ff;"><span>Executive Summary</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_transformer" checked style="accent-color:#00e5ff;"><span>Transformer Type</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_panel_main" checked style="accent-color:#00e5ff;"><span>Electrical Panel Maintenance</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_panel_voltage" checked style="accent-color:#00e5ff;"><span>Panel Voltages (L-L &amp; L-N)</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_earth_voltage" checked style="accent-color:#00e5ff;"><span>Earth Pit Voltage (V)</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_spd_status" checked style="accent-color:#00e5ff;"><span>SPD Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_elr_status" checked style="accent-color:#00e5ff;"><span>ELR Tripping Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_mfm_meter" checked style="accent-color:#00e5ff;"><span>MFM Meter Reading</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_unauth_load" checked style="accent-color:#00e5ff;"><span>Unauthorized Load Check</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_canopy_structure" checked style="accent-color:#00e5ff;"><span>Canopy Structural Integrity</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_cctv_modem" checked style="accent-color:#00e5ff;"><span>Modem &amp; CCTV Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_canopy_lighting" checked style="accent-color:#00e5ff;"><span>Canopy Lighting</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_branding_board" checked style="accent-color:#00e5ff;"><span>External Branding Board</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_instruction_signage" checked style="accent-color:#00e5ff;"><span>Instruction Signage</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_fire_extinguisher" checked style="accent-color:#00e5ff;"><span>Fire Extinguisher Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="civ_civil_bay_bollards" checked style="accent-color:#00e5ff;"><span>Civil Bay &amp; Bollards</span></label>
+
+          <div style="grid-column: span 2; font-size:11px; font-weight:700; color:#00e676; border-bottom:1px solid rgba(0,230,118,0.2); padding-bottom:4px; margin-top:8px; margin-bottom:2px;">Charger Maintenance PM Points</div>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_alarms" checked style="accent-color:#00e676;"><span>Alarms Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_cleaning" checked style="accent-color:#00e676;"><span>Cleaning Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_filter" checked style="accent-color:#00e676;"><span>Dust Filter Replacement</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_cables" checked style="accent-color:#00e676;"><span>Cable Tightness</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_guns" checked style="accent-color:#00e676;"><span>Guns &amp; Sockets Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_rodent" checked style="accent-color:#00e676;"><span>Rodent / Insect Proofing</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_display" checked style="accent-color:#00e676;"><span>Display &amp; Touch Screen</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_doors" checked style="accent-color:#00e676;"><span>Doors &amp; Locks Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_power_module" checked style="accent-color:#00e676;"><span>Power Module Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_input_voltage" checked style="accent-color:#00e676;"><span>Input Voltages (V)</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_ne_voltage" checked style="accent-color:#00e676;"><span>Neutral-Earth Voltage (V)</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_emergency_stop" checked style="accent-color:#00e676;"><span>Emergency Stop Test</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_internet" checked style="accent-color:#00e676;"><span>Internet / Modem Status</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_mcb_smps" checked style="accent-color:#00e676;"><span>SMPS/MCB/RCCB Operation</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_vehicle_test" checked style="accent-color:#00e676;"><span>Vehicle Charging Test</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="chg_rfid" checked style="accent-color:#00e676;"><span>RFID Status</span></label>
+
+          <div style="grid-column: span 2; font-size:11px; font-weight:700; color:#ffb74d; border-bottom:1px solid rgba(255,183,77,0.2); padding-bottom:4px; margin-top:8px; margin-bottom:2px;">Media Proofs &amp; Remarks</div>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="photos" checked style="accent-color:#ffb74d;"><span>Before/After Videos &amp; Photos</span></label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#fff; cursor:pointer;"><input type="checkbox" class="v3-email-point-chk" value="remarks" checked style="accent-color:#ffb74d;"><span>Engineer &amp; Maintenance Remarks</span></label>
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:11px; font-weight:700; color:var(--v3-text-muted); margin-bottom:6px;">ADDITIONAL HOD / CUSTOM NOTES (OPTIONAL)</label>
+        <textarea id="v3_email_custom_notes" rows="2" placeholder="e.g. Earth resistance issue resolved on 22nd July. All parameters verified normal." class="v3-input" style="padding:10px; height:auto;"></textarea>
+      </div>
+
+      <div style="font-size:11px; color:var(--v3-text-muted); background:rgba(0,229,255,0.05); border:1px solid rgba(0,229,255,0.15); padding:10px; border-radius:8px;">
+        ✉️ Email will be dispatched from <strong>the configured operations notification email</strong> with official GOEC branding.
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
+        <button type="button" onclick="closePMEmailModalV3()" style="background:rgba(255,255,255,0.05); border:1px solid var(--v3-panel-border); color:#fff; padding:10px 18px; border-radius:10px; cursor:pointer; font-size:13px;">Cancel</button>
+        <button type="submit" id="v3SendEmailSubmitBtn" style="background:linear-gradient(135deg, #00e5ff, #00b0ff); color:#0f172a; border:none; padding:10px 22px; border-radius:10px; font-weight:800; cursor:pointer; font-size:13px;">🚀 Send Report Email</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+  let rawPMReportOverviewDataV3 = [];
+  let allTimePMReportOverviewDataV3 = [];
+  let currentActiveStationReportV3 = null;
+
+  function initPMReportModuleV3() {
+    // This page's DOM is cached and re-shown (not recreated) on every visit
+    // to this tab - reset any modal left open from a previous visit.
+    ['v3PMReportModal', 'v3PMEmailModal'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    var monthSel = document.getElementById('v3_pm_month_filter');
+    var yearSel = document.getElementById('v3_pm_year_filter');
+    if (monthSel) monthSel.value = '';
+    if (yearSel) yearSel.value = '';
+    loadPMReportOverviewV3('', true);
+  }
+
+  // Builds the "YYYY-MM" (or just "YYYY") string the backend expects from
+  // whatever the month/year selects currently hold.
+  function getSelectedPMMonthStrV3() {
+    const monthSel = document.getElementById('v3_pm_month_filter');
+    const yearSel = document.getElementById('v3_pm_year_filter');
+    const m = monthSel ? monthSel.value : '';
+    let y = yearSel ? yearSel.value : '';
+    if (m !== '' && !y) {
+      // A specific month was picked with "All Years" still selected - default
+      // to the current year rather than silently dropping the month choice,
+      // and reflect that back into the dropdown so it's not a hidden guess.
+      y = new Date().getFullYear().toString();
+      if (yearSel) yearSel.value = y;
+    }
+    if (!y) return '';
+    return m !== '' ? (y + '-' + String(parseInt(m, 10) + 1).padStart(2, '0')) : y;
+  }
+
+  // Month/Year picks a SPECIFIC period, which the server must re-scan the
+  // sheets for (a station's civil/charger PM status for August isn't
+  // something the client can derive from an already-fetched "latest ever"
+  // snapshot) - refetch rather than just re-filtering cached data.
+  function handlePMMonthYearChangeV3() {
+    loadPMReportOverviewV3(getSelectedPMMonthStrV3(), false);
+  }
+
+  function loadPMReportOverviewV3(monthStr, isInitialLoad) {
+    const tbody = document.getElementById('v3PMReportTableBody');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#00e5ff;">⏳ Loading Station PM Audit records...<\/td><\/tr>';
+    }
+
+    runAuthedV4('getPMReportOverviewV3', [monthStr || ''], res => {
+      if (!res || !res.success) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:#f43f5e; text-align:center;">Error: ' + (res ? res.message : 'Failed to load') + '<\/td><\/tr>';
+        return;
+      }
+
+      try {
+        rawPMReportOverviewDataV3 = res.items || [];
+        if (isInitialLoad) {
+          // Filter dropdown OPTIONS (which engineers/years exist at all)
+          // are always derived from the unfiltered baseline, never from a
+          // month-scoped result set - otherwise picking August could itself
+          // shrink the Year/Engineer lists down to just what August has.
+          allTimePMReportOverviewDataV3 = rawPMReportOverviewDataV3;
+          populatePMEngineerFilterV3(allTimePMReportOverviewDataV3);
+          populatePMMonthYearFilterV3(allTimePMReportOverviewDataV3);
+        }
+        updatePMReportKpiSummaryV3(rawPMReportOverviewDataV3);
+        renderPMReportTableV3();
+      } catch(errRender) {
+        console.error("Error rendering table: ", errRender);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:#f43f5e; text-align:center;">Rendering error: ' + (errRender.toString()) + '<\/td><\/tr>';
+      }
+    }, err => {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:#f43f5e; text-align:center;">Error: ' + (err.toString()) + '<\/td><\/tr>';
+    });
+  }
+
+  function populatePMEngineerFilterV3(items) {
+    const select = document.getElementById('v3_pm_engineer_filter');
+    if (!select) return;
+    const currentVal = select.value;
+    const engineers = new Set();
+
+    (items || []).forEach(i => {
+      if (i.engineer && i.engineer !== 'Unassigned') engineers.add(i.engineer.trim());
+    });
+
+    let html = '<option value="">All Engineers<\/option>';
+    Array.from(engineers).sort().forEach(eng => {
+      html += '<option value="' + (eng) + '">' + (eng) + '<\/option>';
+    });
+    select.innerHTML = html;
+    if (currentVal) select.value = currentVal;
+  }
+
+  const PM_MONTH_NAMES_V3 = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function populatePMMonthYearFilterV3(items) {
+    const monthSel = document.getElementById('v3_pm_month_filter');
+    const yearSel = document.getElementById('v3_pm_year_filter');
+    if (!monthSel || !yearSel) return;
+
+    const monthCurVal = monthSel.value;
+    const yearCurVal = yearSel.value;
+
+    let monthHtml = '<option value="">All Months</option>';
+    PM_MONTH_NAMES_V3.forEach((m, i) => { monthHtml += '<option value="' + i + '">' + m + '</option>'; });
+    monthSel.innerHTML = monthHtml;
+    if (monthCurVal) monthSel.value = monthCurVal;
+
+    const years = new Set();
+    (items || []).forEach(i => {
+      const t = parseDueDateV3(i.lastPmDate);
+      if (t && t !== new Date(2099, 11, 31).getTime()) years.add(new Date(t).getFullYear());
+    });
+    years.add(new Date().getFullYear());
+
+    let yearHtml = '<option value="">All Years</option>';
+    Array.from(years).sort((a, b) => b - a).forEach(y => { yearHtml += '<option value="' + y + '">' + y + '</option>'; });
+    yearSel.innerHTML = yearHtml;
+    if (yearCurVal) yearSel.value = yearCurVal;
+  }
+
+  function parseDueDateV3(dateStr) {
+    if (!dateStr) return new Date(2099, 11, 31).getTime();
+    if (dateStr.includes('/')) {
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+      }
+    }
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date(2099, 11, 31).getTime() : d.getTime();
+  }
+
+  function updatePMReportKpiSummaryV3(items) {
+    const totalEl = document.getElementById('kpi_pm_total_stations');
+    const verifEl = document.getElementById('kpi_pm_verified');
+    const pendEl = document.getElementById('kpi_pm_pending_verif');
+    const monthEl = document.getElementById('kpi_pm_this_month');
+
+    if (totalEl) totalEl.textContent = items.length;
+
+    const verifiedCount = items.filter(i => i.isVerified).length;
+    const pendingCount = items.length - verifiedCount;
+    const completedThisMonth = items.filter(i => i.hasCivilThisMonth || i.hasChargerThisMonth).length;
+
+    if (verifEl) verifEl.textContent = verifiedCount;
+    if (pendEl) pendEl.textContent = pendingCount;
+    if (monthEl) monthEl.textContent = completedThisMonth;
+  }
+
+  function filterPMReportTableV3() {
+    renderPMReportTableV3();
+  }
+
+  function renderPMReportTableV3() {
+    const tbody = document.getElementById('v3PMReportTableBody');
+    if (!tbody) return;
+
+    let search1 = (document.getElementById('v3_pm_report_search') ? document.getElementById('v3_pm_report_search').value.trim().toLowerCase() : '');
+    let search2 = (document.getElementById('v3_pm_search_input') ? document.getElementById('v3_pm_search_input').value.trim().toLowerCase() : '');
+    let search = search1 || search2;
+
+    const statusFilterEl = document.getElementById('v3_pm_status_filter');
+    const statusFilter = statusFilterEl ? statusFilterEl.value : 'ALL';
+
+    const engFilterEl = document.getElementById('v3_pm_engineer_filter');
+    const selectedEng = engFilterEl ? engFilterEl.value.trim().toLowerCase() : '';
+
+    const sortFilterEl = document.getElementById('v3_pm_sort_filter');
+    const sortOption = sortFilterEl ? sortFilterEl.value : 'due_asc';
+
+    const monthFilterEl = document.getElementById('v3_pm_month_filter');
+    const monthFilter = monthFilterEl && monthFilterEl.value !== '' ? parseInt(monthFilterEl.value, 10) : null;
+    const yearFilterEl = document.getElementById('v3_pm_year_filter');
+    const yearFilter = yearFilterEl && yearFilterEl.value !== '' ? parseInt(yearFilterEl.value, 10) : null;
+
+    let filtered = (rawPMReportOverviewDataV3 || []).filter(item => {
+      const stName = (item.stationName || '').toLowerCase();
+      const stId = (item.stationId || '').toLowerCase();
+      const eng = (item.engineer || '').toLowerCase();
+
+      const matchesSearch = !search || stName.includes(search) || stId.includes(search) || eng.includes(search);
+      const matchesEng = !selectedEng || eng === selectedEng;
+      let matchesStatus = true;
+      if (statusFilter === 'Verified') matchesStatus = item.isVerified;
+      if (statusFilter === 'Pending') matchesStatus = !item.isVerified;
+
+      let matchesMonthYear = true;
+      if (monthFilter !== null || yearFilter !== null) {
+        const lastPmTime = parseDueDateV3(item.lastPmDate);
+        if (!item.lastPmDate || lastPmTime === new Date(2099, 11, 31).getTime()) {
+          matchesMonthYear = false;
+        } else {
+          const d = new Date(lastPmTime);
+          if (monthFilter !== null && d.getMonth() !== monthFilter) matchesMonthYear = false;
+          if (yearFilter !== null && d.getFullYear() !== yearFilter) matchesMonthYear = false;
+        }
+      }
+
+      return matchesSearch && matchesEng && matchesStatus && matchesMonthYear;
+    });
+
+    // Sorting Logic
+    filtered.sort((a, b) => {
+      if (sortOption === 'due_asc') {
+        return parseDueDateV3(a.nextPmDueDate) - parseDueDateV3(b.nextPmDueDate);
+      } else if (sortOption === 'due_desc') {
+        return parseDueDateV3(b.nextPmDueDate) - parseDueDateV3(a.nextPmDueDate);
+      } else if (sortOption === 'name') {
+        return (a.stationName || '').localeCompare(b.stationName || '');
+      }
+      return 0;
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--v3-text-muted);">No matching PM audit records found.<\/td><\/tr>';
+      return;
+    }
+
+    const todayTime = new Date().setHours(0,0,0,0);
+
+    let html = '';
+    filtered.forEach(item => {
+      const dueTime = parseDueDateV3(item.nextPmDueDate);
+      const isOverdue = dueTime < todayTime;
+
+      let dueBadgeStyle = 'color:#00e5ff; font-weight:700; display:inline-block; white-space:nowrap;';
+      if (isOverdue) {
+        dueBadgeStyle = 'color:#f43f5e; font-weight:800; background:rgba(244,63,94,0.12); padding:4px 10px; border-radius:6px; border:1px solid rgba(244,63,94,0.3); display:inline-block; white-space:nowrap;';
+      } else if (item.nextPmDueDate) {
+        dueBadgeStyle = 'color:#00e676; font-weight:700; background:rgba(0,230,118,0.1); padding:4px 10px; border-radius:6px; border:1px solid rgba(0,230,118,0.2); display:inline-block; white-space:nowrap;';
+      }
+
+      const verifBadge = item.isVerified ? 
+        '<span class="v3-badge v3-badge-success" style="font-size:11px; white-space:nowrap;">Verified ✅<\/span>' : 
+        '<span class="v3-badge v3-badge-warning" style="font-size:11px; white-space:nowrap;">Pending Verification<\/span>';
+
+      const safeStName = (item.stationName || '').replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+
+      var stIdLine = '';
+      if (item.stationId && item.stationId !== item.stationName) {
+        stIdLine = '<div style="font-size:11px; font-weight:600; color:#64748b; margin-top:2px;">ID: ' + item.stationId + '<\/div>';
+      }
+
+      html +=
+        '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">' +
+          '<td style="padding:14px 16px;">' +
+            '<div style="font-weight:700; color:#fff; font-size:14px; line-height:1.3;">' + (item.stationName || '') + '<\/div>' +
+            stIdLine +
+          '<\/td>' +
+          '<td style="padding:14px 16px; font-weight:600; color:var(--v3-cyan); font-size:13px;">' + (item.engineer || 'Unassigned') + '<\/td>' +
+          '<td style="padding:14px 16px; text-align:center; color:#cbd5e1; font-size:13px;">' +
+            (item.lastPmDate || '<span style="color:var(--v3-text-muted);">Pending Initial PM<\/span>') +
+          '<\/td>' +
+          '<td style="padding:14px 16px; text-align:center; font-size:13px;">' +
+            '<span style="' + dueBadgeStyle + '">' +
+              (item.nextPmDueDate || '<span style="color:var(--v3-text-muted);">Not Scheduled<\/span>') +
+              (isOverdue ? ' ⚠️ (Overdue)' : '') +
+            '<\/span>' +
+          '<\/td>' +
+          '<td style="padding:14px 16px; text-align:center;">' + verifBadge + '<\/td>' +
+          '<td style="padding:14px 16px; text-align:right;">' +
+            '<button type="button" onclick="openPMReportModalV3(\'' + safeStName + '\')" class="v3-btn-view">👁️ View PM Report<\/button>' +
+          '<\/td>' +
+        '<\/tr>';
+    });
+
+    tbody.innerHTML = html;
+  }
+
+  // --- VIEW REPORT MODAL ---
+  function openPMReportModalV3(stationName) {
+    const title = document.getElementById('v3PMReportModalStationTitle');
+    if (title) title.textContent = 'Station PM Audit Report: ' + (stationName);
+
+    const content = document.getElementById('v3PMReportModalContent');
+    if (content) content.innerHTML = '<div style="text-align:center; padding:40px; color:#00e5ff;">⏳ Fetching detailed Civil & Charger PM reports...<\/div>';
+
+    // Reset the verification badge/button too - otherwise the PREVIOUS
+    // station's verification status stays visible until this station's
+    // data finishes loading, which looks like a wrong/stuck result.
+    const badgeContainer = document.getElementById('v3PMVerificationBadgeContainer');
+    if (badgeContainer) badgeContainer.innerHTML = '<span style="background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.3); color:#94a3b8; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700;">⏳ Loading status...<\/span>';
+    const verifyBtn = document.getElementById('btnVerifyPM');
+    if (verifyBtn) verifyBtn.style.display = 'none';
+
+    const modal = document.getElementById('v3PMReportModal');
+    if (modal) modal.style.display = 'flex';
+
+    runAuthedV4('getStationFullPMReportV3', [stationName], res => {
+      if (!res || !res.success) {
+        if (content) content.innerHTML = '<div style="color:#f43f5e; text-align:center; padding:20px;">Error: ' + (res ? res.message : 'Failed to fetch report') + '<\/div>';
+        return;
+      }
+
+      currentActiveStationReportV3 = res;
+      renderFullStationPMReportV3(res);
+    }, err => {
+      console.error('getStationFullPMReportV3 failure:', err);
+      if (content) content.innerHTML = '<div style="color:#f43f5e; text-align:center; padding:20px;">Error loading PM details: ' + (err ? (err.message || err.toString()) : 'Unknown error') + '<\/div>';
+    });
+  }
+
+  function renderFullStationPMReportV3(data) {
+    const content = document.getElementById('v3PMReportModalContent');
+    const badgeContainer = document.getElementById('v3PMVerificationBadgeContainer');
+    const verifyBtn = document.getElementById('btnVerifyPM');
+
+    if (badgeContainer) {
+      if (data.isVerified) {
+        badgeContainer.innerHTML = '<span style="background:rgba(0,230,118,0.15); border:1px solid rgba(0,230,118,0.35); color:#00e676; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700;">✅ PM Verified by ' + (data.verifier || 'HOD') + ' on ' + (data.verifiedDate || '') + '<\/span>';
+        if (verifyBtn) { verifyBtn.style.display = 'none'; }
+      } else {
+        badgeContainer.innerHTML = '<span style="background:rgba(255,183,77,0.15); border:1px solid rgba(255,183,77,0.35); color:#ffb74d; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700;">⏳ Status: Pending HOD Verification<\/span>';
+        if (verifyBtn) { verifyBtn.style.display = 'inline-flex'; }
+      }
+    }
+
+    const civilList = (data.civilLogs && data.civilLogs.length > 0) ? data.civilLogs : (data.civilLog && data.civilLog.pmDate ? [data.civilLog] : []);
+    const chargerList = (data.chargerLogs && data.chargerLogs.length > 0) ? data.chargerLogs : (data.chargerLog && data.chargerLog.pmDate ? [data.chargerLog] : []);
+
+    if (civilList.length === 0 && chargerList.length === 0) {
+      content.innerHTML =
+        '<div style="background:rgba(0,229,255,0.05); border:1px solid rgba(0,229,255,0.2); border-radius:16px; padding:36px 20px; text-align:center; margin:20px 0;">' +
+          '<div style="font-size:40px; margin-bottom:12px;">ℹ️<\/div>' +
+          '<h4 style="color:#fff; font-size:18px; margin-bottom:8px; font-family:\'Space Grotesk\';">No PM Inspection Records Submitted Yet<\/h4>' +
+          '<p style="color:var(--v3-text-muted); font-size:13px; max-width:500px; margin:0 auto 18px auto;">Preventive Maintenance checklists for Civil & Electrical or Charger have not been submitted for <strong>' + (data.stationName) + '<\/strong> yet.<\/p>' +
+          '<span class="v3-badge v3-badge-warning" style="font-size:12px; padding:6px 14px;">Status: Pending Initial PM Schedule<\/span>' +
+        '<\/div>';
+      return;
+    }
+
+    // Helper to build a grid item
+    function pmItem(label, val, extraStyle) {
+      return '<div class="v3-pm-item"><span class="v3-pm-label">' + label + '<\/span><span class="v3-pm-val"' + (extraStyle ? ' style="' + extraStyle + '"' : '') + '>' + (val || '-') + '<\/span><\/div>';
+    }
+
+    // Build Civil PM section(s)
+    var civilHtml = '';
+    civilList.forEach(function(civil, cIdx) {
+      var sectionTitle = civilList.length > 1 ? ('Structure / Panel ' + (cIdx + 1)) : 'Electrical & Civil';
+      civilHtml +=
+        '<div class="v3-pm-section-box">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px;">' +
+            '<h4 style="font-family:\'Space Grotesk\'; font-size:16px; color:#00e5ff;">⚡ Section 1: ' + sectionTitle + ' PM Report<\/h4>' +
+            '<span style="font-size:12px; color:var(--v3-text-muted);">PM Date: ' + (civil.pmDate || 'N/A') + ' | Eng: ' + (civil.engineer || 'N/A') + '<\/span>' +
+          '<\/div>' +
+          '<div class="v3-pm-grid-list">' +
+            pmItem('Transformer Type', civil.transformerInstalled) +
+            pmItem('Electrical Panel Maintenance', civil.panelMaintenance) +
+            pmItem('Panel Voltages (L-L & L-N)', civil.panelVoltage, 'color:#00e5ff;') +
+            pmItem('Earth Pit Voltage (V)', civil.earthPitVoltage, 'color:#00e676;') +
+            pmItem('SPD Status', civil.spdStatus) +
+            pmItem('ELR Tripping Status', civil.elrStatus) +
+            pmItem('MFM Meter Reading', civil.mfmMeterStatus) +
+            pmItem('Unauthorized Load Check', civil.unauthorizedLoad) +
+            pmItem('Canopy Structural Integrity', civil.canopyLeakageStatus) +
+            pmItem('Modem & CCTV Status', civil.cctvModemStatus) +
+            pmItem('Canopy Lighting', civil.canopyLightingStatus) +
+            pmItem('External Branding Board', civil.brandingBoardStatus) +
+            pmItem('Instruction & Do\'s/Don\'ts Signage', civil.instructionSignageStatus) +
+            pmItem('Fire Extinguisher Status', civil.fireExtinguisherStatus) +
+            pmItem('Civil Bay, Painting & Bollards', civil.civilBayBollardsStatus) +
+          '<\/div>';
+
+      if (civil.remarks) {
+        civilHtml += '<div style="margin-top:12px; font-size:12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;"><strong style="color:var(--v3-cyan);">Civil Remarks:<\/strong> ' + civil.remarks + '<\/div>';
+      }
+
+      if (civil.beforePmMedia || civil.afterPmMedia || civil.fireExtinguisherPhoto) {
+        civilHtml += '<div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">';
+        if (civil.beforePmMedia) {
+          civilHtml += '<a href="' + civil.beforePmMedia + '" target="_blank" style="background:rgba(0,229,255,0.1); border:1px solid rgba(0,229,255,0.3); color:#00e5ff; padding:4px 10px; border-radius:6px; font-size:11px; text-decoration:none;">🎬 Civil Before PM Video<\/a>';
+        }
+        if (civil.afterPmMedia) {
+          civilHtml += '<a href="' + civil.afterPmMedia + '" target="_blank" style="background:rgba(0,230,118,0.1); border:1px solid rgba(0,230,118,0.3); color:#00e676; padding:4px 10px; border-radius:6px; font-size:11px; text-decoration:none;">🎬 Civil After PM Video<\/a>';
+        }
+        if (civil.fireExtinguisherPhoto) {
+          civilHtml += '<a href="' + civil.fireExtinguisherPhoto + '" target="_blank" style="background:rgba(255,183,77,0.1); border:1px solid rgba(255,183,77,0.3); color:#ffb74d; padding:4px 10px; border-radius:6px; font-size:11px; text-decoration:none;">📷 Fire Extinguisher Photo<\/a>';
+        }
+        civilHtml += '<\/div>';
+      }
+      civilHtml += '<\/div>';
+    });
+
+    // Build Charger PM sections
+    var chargerHtml = '';
+    chargerList.forEach(function(charger, idx) {
+      var sectionTitle = chargerList.length > 1 ? 'Charger ' + (idx + 1) : 'Charger';
+      var cpLabel = charger.cpId ? ' (' + charger.cpId + ') ' : '';
+
+      chargerHtml +=
+        '<div class="v3-pm-section-box">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px;">' +
+            '<h4 style="font-family:\'Space Grotesk\'; font-size:16px; color:#00e676;">🔌 Section 2: ' + sectionTitle + ' PM Maintenance Report<\/h4>' +
+            '<span style="font-size:12px; color:var(--v3-text-muted);">CP ID: ' + (charger.cpId || 'N/A') + ' | Serial: ' + (charger.serialNo || 'N/A') + '<\/span>' +
+          '<\/div>' +
+          '<div class="v3-pm-grid-list">' +
+            pmItem('Capacity & Type', charger.capacityAndType) +
+            pmItem('Alarms Status', charger.alarmsStatus) +
+            pmItem('Cleaning Status', charger.cleaningStatus) +
+            pmItem('Dust Filter Replacement', charger.filterReplacement) +
+            pmItem('Cable Tightness', charger.cablesTightness) +
+            pmItem('Guns & Sockets', charger.gunsAndSockets) +
+            pmItem('Rodent / Insect Proofing', charger.rodentProofing) +
+            pmItem('Display & Touch Screen', charger.displayTouchStatus) +
+            pmItem('Doors & Locks', charger.doorsHingesStatus) +
+            pmItem('Power Module Status', charger.powerModuleStatus) +
+            pmItem('Input Voltages (V)', charger.inputVoltages, 'color:#00e5ff;') +
+            pmItem('Neutral-Earth Voltage (V)', charger.neutralEarthVoltage, 'color:#00e676;') +
+            pmItem('Emergency Stop Test', charger.emergencyStopTest) +
+            pmItem('Internet / Modem Status', charger.internetStatus) +
+            pmItem('SMPS/MCB/RCCB Operation', charger.mcbRccbSmpsStatus) +
+            pmItem('Vehicle Charging Test', charger.vehicleChargingTest) +
+            pmItem('RFID Status', charger.rfidStatus) +
+          '<\/div>';
+
+      if (charger.remarks) {
+        chargerHtml += '<div style="margin-top:12px; font-size:12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px;"><strong style="color:#00e676;">Charger Remarks:<\/strong> ' + charger.remarks + '<\/div>';
+      }
+
+      if (charger.beforePmMedia || charger.afterPmMedia) {
+        chargerHtml += '<div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">';
+        if (charger.beforePmMedia) {
+          chargerHtml += '<a href="' + charger.beforePmMedia + '" target="_blank" style="background:rgba(0,229,255,0.1); border:1px solid rgba(0,229,255,0.3); color:#00e5ff; padding:4px 10px; border-radius:6px; font-size:11px; text-decoration:none;">🎬 Charger' + cpLabel + 'Before PM Video<\/a>';
+        }
+        if (charger.afterPmMedia) {
+          chargerHtml += '<a href="' + charger.afterPmMedia + '" target="_blank" style="background:rgba(0,230,118,0.1); border:1px solid rgba(0,230,118,0.3); color:#00e676; padding:4px 10px; border-radius:6px; font-size:11px; text-decoration:none;">📷 Charger' + cpLabel + 'After PM Photo<\/a>';
+        }
+        chargerHtml += '<\/div>';
+      }
+
+      chargerHtml += '<\/div>';
+    });
+
+    var html = '<div style="display:flex; flex-direction:column; gap:20px;">' + civilHtml + chargerHtml + '<\/div>';
+
+    if (content) content.innerHTML = html;
+  }
+
+
+  function closePMReportModalV3() {
+    const modal = document.getElementById('v3PMReportModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function handleVerifyCurrentPMV3() {
+    if (!currentActiveStationReportV3) return;
+    const stName = currentActiveStationReportV3.stationName;
+    const user = window.currentUserV3;
+    const verifier = user ? (user.fullName || user.username) : 'HOD';
+
+    const verifyBtn = document.getElementById('btnVerifyPM');
+    if (verifyBtn) { verifyBtn.textContent = 'Verifying...'; verifyBtn.disabled = true; }
+
+    runAuthedV4('verifyStationPMV3', [stName, verifier], res => {
+        if (verifyBtn) { verifyBtn.textContent = '✅ Mark PM as Verified'; verifyBtn.disabled = false; }
+        alert(res.message);
+        if (res.success) {
+          // Instant UI Badge Refresh
+          const badgeContainer = document.getElementById('v3PMVerificationBadgeContainer');
+          if (badgeContainer) {
+            badgeContainer.innerHTML = '<span style="background:rgba(0,230,118,0.15); border:1px solid rgba(0,230,118,0.35); color:#00e676; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700;">✅ PM Verified by ' + verifier + '</span>';
+          }
+          if (verifyBtn) { verifyBtn.style.display = 'none'; }
+          if (typeof currentActiveStationReportV3 !== 'undefined' && currentActiveStationReportV3) {
+            currentActiveStationReportV3.isVerified = true;
+            currentActiveStationReportV3.verifier = verifier;
+          }
+          openPMReportModalV3(stName);
+          loadPMReportOverviewV3(getSelectedPMMonthStrV3(), false);
+
+          // One-click flow: pre-fill and open the report email using this
+          // station's saved investor contact so the HOD just reviews & sends.
+          runAuthedV4('getStationInvestorContactV3', [stName], contactRes => {
+            const investorName = (contactRes && contactRes.success) ? contactRes.investorName : '';
+            const investorEmails = (contactRes && contactRes.success) ? contactRes.investorEmails : '';
+            openEmailCustomizerModalV3(investorName, investorEmails);
+          }, () => {
+            openEmailCustomizerModalV3('', '');
+          });
+        }
+    }, err => {
+        if (verifyBtn) { verifyBtn.textContent = '✅ Mark PM as Verified'; verifyBtn.disabled = false; }
+        alert('Verification error: ' + err.toString());
+    });
+  }
+
+  // --- EMAIL DISPATCH MODAL HANDLERS ---
+  function openEmailCustomizerModalV3(prefillName, prefillEmails) {
+    if (!currentActiveStationReportV3) return;
+
+    // Custom notes never carry an intentional "keep previous value" case -
+    // always clear it so a note written for a different station can't get
+    // sent along with this one.
+    const notesInput = document.getElementById('v3_email_custom_notes');
+    if (notesInput) notesInput.value = '';
+
+    if (prefillName === undefined && prefillEmails === undefined) {
+      // Opened directly via "Send PM Report Email" (not the post-verify
+      // auto-flow) - always fetch THIS station's own investor contact fresh,
+      // so a previously-viewed station's name/email/checkboxes can never
+      // leak into an email actually meant for this one.
+      const stName = currentActiveStationReportV3.stationName;
+      runAuthedV4('getStationInvestorContactV3', [stName], contactRes => {
+        const investorName = (contactRes && contactRes.success) ? contactRes.investorName : '';
+        const investorEmails = (contactRes && contactRes.success) ? contactRes.investorEmails : '';
+        applyEmailModalPrefillV3(investorName, investorEmails);
+      }, () => {
+        applyEmailModalPrefillV3('', '');
+      });
+      return;
+    }
+
+    applyEmailModalPrefillV3(prefillName, prefillEmails);
+  }
+
+  function applyEmailModalPrefillV3(prefillName, prefillEmails) {
+    const nameInput = document.getElementById('v3_email_recipient_name');
+    const emailInput = document.getElementById('v3_email_recipient_email');
+    const hint = document.getElementById('v3EmailNoInvestorHint');
+
+    nameInput.value = prefillName || '';
+    emailInput.value = prefillEmails || '';
+    if (hint) hint.style.display = prefillEmails ? 'none' : 'block';
+    toggleAllEmailPointsV3(true);
+
+    const modal = document.getElementById('v3PMEmailModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closePMEmailModalV3() {
+    const modal = document.getElementById('v3PMEmailModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function toggleAllEmailPointsV3(selectState) {
+    const checkboxes = document.querySelectorAll('.v3-email-point-chk');
+    checkboxes.forEach(chk => chk.checked = selectState);
+  }
+
+  function handleSendPMEmailV3(e) {
+    e.preventDefault();
+    if (!currentActiveStationReportV3) return;
+
+    const name = document.getElementById('v3_email_recipient_name').value.trim();
+    const email = document.getElementById('v3_email_recipient_email').value.trim();
+    const notes = document.getElementById('v3_email_custom_notes').value.trim();
+
+    const selectedSections = {};
+    const checkboxes = document.querySelectorAll('.v3-email-point-chk');
+    checkboxes.forEach(chk => {
+      selectedSections[chk.value] = chk.checked;
+    });
+
+    const submitBtn = document.getElementById('v3SendEmailSubmitBtn');
+    if (submitBtn) { submitBtn.textContent = 'Sending Email...'; submitBtn.disabled = true; }
+
+    runAuthedV4('sendPMReportEmailV3', [email, name, currentActiveStationReportV3.stationName, selectedSections, notes], res => {
+      if (submitBtn) { submitBtn.textContent = '🚀 Send Report Email'; submitBtn.disabled = false; }
+      alert(res.message);
+      if (res.success) {
+        closePMEmailModalV3();
+      }
+    }, err => {
+      if (submitBtn) { submitBtn.textContent = '🚀 Send Report Email'; submitBtn.disabled = false; }
+      alert('Email sending error: ' + err.toString());
+    });
+  }
+
+  function compressVideoHDV3(file, targetBitrate = 10000000) {
+    return new Promise((resolve) => {
+      if (!file || file.size <= 8 * 1024 * 1024) {
+        resolve(null);
+        return;
+      }
+
+      const video = document.createElement('video');
+      video.muted = true;
+      video.playsInline = true;
+      video.src = URL.createObjectURL(file);
+
+      video.onloadedmetadata = () => {
+        let width = video.videoWidth || 1920;
+        let height = video.videoHeight || 1080;
+        const maxDim = 1920;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        width = width - (width % 2);
+        height = height - (height % 2);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        let stream;
+        try {
+          stream = canvas.captureStream(30);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        let mimeType = 'video/mp4';
+        if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm;codecs=vp8';
+          if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = '';
+          }
+        }
+
+        const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: targetBitrate } : { videoBitsPerSecond: targetBitrate };
+        let recorder;
+        try {
+          recorder = new MediaRecorder(stream, recorderOptions);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        const chunks = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = () => {
+          const compressedBlob = new Blob(chunks, { type: mimeType || 'video/mp4' });
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target.result.split(',')[1];
+            resolve({ base64, mimeType: mimeType || 'video/mp4', size: compressedBlob.size });
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(compressedBlob);
+        };
+
+        video.playbackRate = 2.0;
+        try {
+          recorder.start(100);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        function drawFrame() {
+          if (!video.paused && !video.ended) {
+            ctx.drawImage(video, 0, 0, width, height);
+            requestAnimationFrame(drawFrame);
+          }
+        }
+
+        video.onplay = () => {
+          drawFrame();
+        };
+
+        video.onended = () => {
+          try { recorder.stop(); } catch(e){}
+        };
+
+        video.play().catch(() => resolve(null));
+      };
+
+      video.onerror = () => resolve(null);
+    });
+  }
+</script>

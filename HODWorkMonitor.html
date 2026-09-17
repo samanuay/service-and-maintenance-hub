@@ -1,0 +1,584 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; }
+  body, div, p, span, label, h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+  h1, h2, h3, .v3-form-title, .v4-form-title { font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif !important; }
+
+  .v3-input, .v4-input, input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    color: #f8fafc !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    outline: none !important;
+    width: 100%;
+    transition: all 0.2s ease;
+  }
+  .v3-input:focus, .v4-input:focus, input:focus, select:focus, textarea:focus {
+    border-color: #00e5ff !important;
+    box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2) !important;
+  }
+</style>
+
+<div class="v3-module-container" style="max-width: 1100px; margin: 0 auto;">
+  <div style="background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); overflow: hidden; display: flex; flex-direction: column;">
+    
+    <!-- Header Banner -->
+    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 24px 20px; text-align: center;">
+      <h1 style="font-family:'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 4px;">HOD Engineer Work &amp; Comp-Off Monitor</h1>
+      <p style="color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">MONTHLY ATTENDANCE, STANDBY &amp; COMP-OFF OVERALL MATRIX</p>
+    </div>
+
+    <!-- Filter Controls Bar -->
+    <div style="padding: 20px 24px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Select Engineer *</label>
+        <select id="v3HODWorkEngineerSelect" onchange="loadHODWorkMatrixV3()" class="v3-input" style="min-width:200px;">
+          <option value="ALL">All Engineers Overview</option>
+          <option value="Althaf">Althaf (Service Engineer)</option>
+          <option value="Athul Krishna">Athul Krishna (Service Engineer)</option>
+          <option value="Bibin">Bibin (Service Engineer)</option>
+          <option value="Chandrakant">Chandrakant (Service Engineer)</option>
+          <option value="Hameed">Hameed (Service Engineer)</option>
+          <option value="Nithin" selected>Nithin (Service Engineer)</option>
+          <option value="Rudraksh">Rudraksh (Service Engineer)</option>
+          <option value="Safnan">Safnan (Service Engineer)</option>
+          <option value="Shaflad">Shaflad (Service Engineer)</option>
+          <option value="Sidharth">Sidharth (Field Engineer)</option>
+          <option value="Sojith M">Sojith M (Service Engineer)</option>
+          <option value="Vikas">Vikas (Service Engineer)</option>
+          <option value="Yadhu Krishnan">Yadhu Krishnan (Service Engineer)</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Select Month / Year *</label>
+        <input type="month" id="v3HODWorkMonthSelect" onchange="loadHODWorkMatrixV3()" class="v3-input" style="min-width:180px;">
+      </div>
+
+      <button type="button" onclick="loadHODWorkMatrixV3()" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:10px 20px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        📊 Generate Matrix
+      </button>
+      <button type="button" onclick="exportHODWorkReportExcelV3()" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        📥 Download Excel
+      </button>
+      <button type="button" onclick="exportHODWorkReportPDFV3()" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        📄 Download PDF
+      </button>
+
+      <div style="margin-left:auto; display:flex; gap:12px; font-size:11px; color:#94a3b8;">
+        <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#10b981; border-radius:50%;"></span> Work Done</span>
+        <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#f59e0b; border-radius:50%;"></span> Standby Day</span>
+        <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#64748b; border-radius:50%;"></span> Official Off (Sun/3rd Sat)</span>
+        <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#8b5cf6; border-radius:50%;"></span> Comp-Off Earned</span>
+      </div>
+    </div>
+
+    <!-- Summary Overview Cards -->
+    <div style="padding: 20px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #10b981; font-weight: 700; text-transform: uppercase;">Days Worked</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;" id="v3StatDaysWorked">0</div>
+      </div>
+
+      <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #f59e0b; font-weight: 700; text-transform: uppercase;">Standby Days</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;" id="v3StatStandbyDays">0</div>
+      </div>
+
+      <div style="background: rgba(100, 116, 139, 0.1); border: 1px solid rgba(100, 116, 139, 0.25); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #cbd5e1; font-weight: 700; text-transform: uppercase;">Official Offs</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;" id="v3StatOffDays">0</div>
+      </div>
+
+      <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #60a5fa; font-weight: 700; text-transform: uppercase;">Carried Over</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;" id="v3StatCarriedOver">0</div>
+      </div>
+
+      <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #a78bfa; font-weight: 700; text-transform: uppercase;">Earned This Month</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;" id="v3StatEarnedThisMonth">0</div>
+      </div>
+
+      <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(16, 185, 129, 0.2)); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #34d399; font-weight: 700; text-transform: uppercase;">Comp-Off Balance</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;" id="v3StatCompOffBalance">0</div>
+      </div>
+    </div>
+
+    <!-- Monthly Calendar Matrix Grid -->
+    <div style="padding: 0 24px 24px 24px; overflow-x: auto;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+        <span>📅 Day-by-Day Monthly Calendar Grid</span>
+        <span style="font-size: 11px; color: #94a3b8; font-weight: normal;">HOD Click any day row to edit/override status</span>
+      </h3>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; color: #cbd5e1; text-align: left;">
+        <thead>
+          <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <th style="padding: 10px; color: #94a3b8; width: 120px;">Date &amp; Day</th>
+            <th style="padding: 10px; color: #94a3b8; width: 150px;">Day Type</th>
+            <th style="padding: 10px; color: #94a3b8; width: 180px;">System Status</th>
+            <th style="padding: 10px; color: #94a3b8;">Logged Activities Summary</th>
+            <th style="padding: 10px; color: #94a3b8; width: 160px; text-align: right;">HOD Action / Override</th>
+          </tr>
+        </thead>
+        <tbody id="v3HODMatrixTbody">
+          <tr>
+            <td colspan="5" style="padding: 20px; text-align: center; color: #94a3b8;">Select engineer and month to render matrix.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- HOD Override Modal -->
+<div id="v3HODOverrideModal" onclick="if(event.target===this) closeHODOverrideModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:rgba(15,23,42,0.96); border:1px solid rgba(59,130,246,0.4); box-shadow:0 0 50px rgba(0,0,0,0.8); border-radius:20px; max-width:440px; width:100%; padding:24px; color:#fff;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+      <h3 style="font-size:16px; font-weight:700; margin:0;" id="v3OverrideModalTitle">Override Day Status</h3>
+      <button type="button" onclick="closeHODOverrideModal()" style="background:none; border:none; color:#94a3b8; font-size:22px; cursor:pointer; line-height:1; padding:0;">&times;</button>
+    </div>
+    <p style="font-size:12px; color:#94a3b8; margin-bottom:16px;" id="v3OverrideModalSubtitle">Select HOD status for engineer</p>
+
+    <div style="margin-bottom:20px;">
+      <label style="display:block; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Select New Status *</label>
+            <select id="v3OverrideStatusSelect" class="v3-input">
+        <option value="AUTO">Auto (System Calculated)</option>
+        <option value="Work Done">Work Done (PM/CM/Other)</option>
+        <option value="Standby Day">Standby Day</option>
+        <option value="Official Off">Official Off (Sunday / 3rd Sat)</option>
+        <option value="Comp-Off Earned">Comp-Off Earned</option>
+        <option value="Comp-Off Declined">Comp-Off Declined (HOD Declined)</option>
+        <option value="Comp-Off Availed">Comp-Off Availed / Leave</option>
+      </select>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+      <button type="button" onclick="closeHODOverrideModal()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#94a3b8; padding:8px 16px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer;">
+        Cancel
+      </button>
+      <button type="button" onclick="saveHODOverrideStatus()" style="background:linear-gradient(135deg, #00e5ff, #3b82f6); color:#07090e; border:none; padding:8px 20px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 0 16px rgba(0,229,255,0.3);">
+        Save Override
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+  var activeOverrideTarget = { engineer: '', dateStr: '' };
+  var cachedHODMatrixResV3 = null;
+
+  function exportHODWorkReportExcelV3() {
+    var engSelect = document.getElementById('v3HODWorkEngineerSelect');
+    var monthSelect = document.getElementById('v3HODWorkMonthSelect');
+    var engName = engSelect ? engSelect.value : 'Engineer';
+    var monthVal = monthSelect ? monthSelect.value : new Date().toISOString().substring(0, 7);
+
+    if (!cachedHODMatrixResV3 || !Array.isArray(cachedHODMatrixResV3.matrix) || cachedHODMatrixResV3.matrix.length === 0) {
+      alert("Please generate matrix first to download report.");
+      return;
+    }
+
+    var csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Date,Day Name,Day Type,System Status,Logged Activities Summary,HOD Final Status\n";
+
+    cachedHODMatrixResV3.matrix.forEach(function(row) {
+      var dStr = row.dateStr || "";
+      var dName = row.dayName || "";
+      var dType = row.isOfficialOff ? (row.offReason || "Official Off") : "Regular Workday";
+      var sysStat = row.systemStatus || "";
+      var actSum = (row.activitySummary || "No activities logged").replace(/"/g, '""');
+      var finalStat = row.effectiveStatus || sysStat;
+
+      csvContent += '"' + dStr + '","' + dName + '","' + dType + '","' + sysStat + '","' + actSum + '","' + finalStat + '"\n';
+    });
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "HOD_Monthly_Work_Report_" + engName.replace(/\s+/g, '_') + "_" + monthVal + ".csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function exportHODWorkReportPDFV3() {
+    var engSelect = document.getElementById('v3HODWorkEngineerSelect');
+    var monthSelect = document.getElementById('v3HODWorkMonthSelect');
+    var engName = engSelect ? engSelect.value : 'Engineer';
+    var monthVal = monthSelect ? monthSelect.value : new Date().toISOString().substring(0, 7);
+
+    if (!cachedHODMatrixResV3 || !Array.isArray(cachedHODMatrixResV3.matrix) || cachedHODMatrixResV3.matrix.length === 0) {
+      alert("Please generate matrix first to download PDF report.");
+      return;
+    }
+
+    var printWin = window.open('', '_blank', 'width=950,height=750');
+    if (!printWin) {
+      alert("Please allow popups to download/print PDF report.");
+      return;
+    }
+
+    var rowsHtml = '';
+    cachedHODMatrixResV3.matrix.forEach(function(row) {
+      var dType = row.isOfficialOff ? ('<span style="color:#8b5cf6; font-weight:bold;">' + row.offReason + '</span>') : 'Regular Workday';
+      var actSum = row.activitySummary || '<span style="color:#94a3b8;">No activities logged</span>';
+      
+      var statusColor = '#333';
+      if (row.effectiveStatus === 'Work Done') statusColor = '#10b981';
+      else if (row.effectiveStatus === 'Standby Day') statusColor = '#f59e0b';
+      else if (row.effectiveStatus === 'Comp-Off Earned') statusColor = '#8b5cf6';
+      else if (row.effectiveStatus === 'Comp-Off Declined') statusColor = '#ef4444';
+
+      rowsHtml += '<tr>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold;">' + row.dateStr + '<div style="font-size:10px; color:#666;">' + row.dayName + '</div></td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd;">' + dType + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold; color:' + statusColor + ';">' + row.effectiveStatus + (row.isOverridden ? ' (HOD Override)' : '') + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd;">' + actSum + '</td>' +
+      '</tr>';
+    });
+
+    var sum = cachedHODMatrixResV3.summary || {};
+
+    var pdfContent = '<html><head><title>HOD Monthly Work Report - ' + engName + ' (' + monthVal + ')</title>' +
+      '<style>' +
+        'body { font-family: Arial, sans-serif; margin: 20px; color: #333; }' +
+        '.header { text-align: center; border-bottom: 2px solid #10b981; padding-bottom: 10px; margin-bottom: 20px; }' +
+        '.header h1 { margin: 0; color: #10b981; font-size: 22px; }' +
+        '.header p { margin: 4px 0 0 0; color: #666; font-size: 12px; font-weight: bold; }' +
+        '.summary-grid { display: flex; gap: 10px; margin-bottom: 20px; text-align: center; }' +
+        '.card { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; background: #f8fafc; }' +
+        '.card-title { font-size: 10px; color: #64748b; font-weight: bold; text-transform: uppercase; }' +
+        '.card-val { font-size: 18px; font-weight: bold; color: #0f172a; margin-top: 2px; }' +
+        'table.report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }' +
+        'table.report-table th { background: #f1f5f9; padding: 10px; border-bottom: 2px solid #cbd5e1; text-align: left; }' +
+        '@media print { body { margin: 0; } }' +
+      '</style></head><body>' +
+      '<div class="header">' +
+        '<h1>GO EC Service & Maintenance</h1>' +
+        '<p>Engineer Monthly Work Report</p>' +
+      '</div>' +
+      '<div style="margin-bottom:15px; font-size:13px;">' +
+        '<strong>Engineer:</strong> ' + engName + ' &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Month/Year:</strong> ' + monthVal + ' &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Report Generated:</strong> ' + new Date().toLocaleDateString() +
+      '</div>' +
+      '<div class="summary-grid">' +
+        '<div class="card"><div class="card-title">Days Worked</div><div class="card-val">' + (sum.daysWorked || 0) + '</div></div>' +
+        '<div class="card"><div class="card-title">Standby Days</div><div class="card-val">' + (sum.standbyDays || 0) + '</div></div>' +
+        '<div class="card"><div class="card-title">Official Offs</div><div class="card-val">' + (sum.offDays || 0) + '</div></div>' +
+      '</div>' +
+      '<table class="report-table">' +
+        '<thead><tr>' +
+          '<th>Date & Day</th>' +
+          '<th>Day Type</th>' +
+          '<th>Status</th>' +
+          '<th>Logged Activities Summary</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rowsHtml + '</tbody>' +
+      '\\x3Cscript\\x3Ewindow.onload = function() { window.print(); };\\x3C/script\\x3E' +
+      '</body></html>';
+
+    printWin.document.write(pdfContent);
+    printWin.document.close();
+  }
+
+  function loadHODWorkMatrixV3() {
+    var engSelect = document.getElementById('v3HODWorkEngineerSelect');
+    var monthSelect = document.getElementById('v3HODWorkMonthSelect');
+    var tbody = document.getElementById('v3HODMatrixTbody');
+
+    if (!engSelect || !monthSelect || !tbody) return;
+
+    if (!monthSelect.value) {
+      var now = new Date();
+      var mStr = ("0" + (now.getMonth() + 1)).slice(-2);
+      monthSelect.value = now.getFullYear() + "-" + mStr;
+    }
+
+    var selectedEng = engSelect.value;
+    var selectedMonth = monthSelect.value;
+
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; text-align:center; color:#94a3b8;">Calculating monthly work matrix for ' + selectedEng + ' (' + selectedMonth + ')...</td></tr>';
+
+    runAuthedV4('getHODMonthlyWorkMatrixV3', [selectedEng, selectedMonth], function(res) {
+        cachedHODMatrixResV3 = (res && res.matrix) ? res : null;
+        if (!res || !res.success || !Array.isArray(res.matrix)) {
+          tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; text-align:center; color:#f43f5e;">Failed to calculate matrix data: ' + (res ? (res.error || 'Unknown error') : 'No response') + '</td></tr>';
+          return;
+        }
+
+        
+        const allEngContainer = document.getElementById('v3AllEngineersOverviewContainer') || document.getElementById('v2AllEngineersOverviewContainer');
+        const allEngTbody = document.getElementById('v3AllEngineersOverviewTbody') || document.getElementById('v2AllEngineersOverviewTbody');
+
+        if (res.isAllEngineers && Array.isArray(res.allEngineersSummary) && res.allEngineersSummary.length > 0) {
+          if (allEngContainer) allEngContainer.style.display = 'block';
+          if (allEngTbody) {
+            let rowHtml = '';
+            res.allEngineersSummary.forEach(function(eng) {
+              rowHtml += '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                '<td style="padding:12px 16px; font-weight:700; color:#fff;">👤 ' + eng.engineerName + '</td>' +
+                '<td style="padding:12px;"><span style="background:rgba(16,185,129,0.15); color:#10b981; padding:4px 10px; border-radius:6px; font-weight:700;">' + eng.daysWorked + ' Days</span></td>' +
+                '<td style="padding:12px;"><span style="background:rgba(245,158,11,0.15); color:#f59e0b; padding:4px 10px; border-radius:6px; font-weight:700;">' + eng.standbyDays + ' Days</span></td>' +
+                '<td style="padding:12px;"><span style="color:#cbd5e1;">' + eng.offDays + ' Days</span></td>' +
+                '<td style="padding:12px;"><span style="background:rgba(139,92,246,0.15); color:#a78bfa; padding:4px 10px; border-radius:6px; font-weight:700;">' + eng.compOffEarned + '</span></td>' +
+                '<td style="padding:12px;"><span style="background:rgba(0,229,255,0.15); color:#00e5ff; padding:4px 10px; border-radius:6px; font-weight:700;">' + eng.compOffBalance + '</span></td>' +
+                '<td style="padding:12px 16px; text-align:right;">' +
+                  '<button type="button" onclick="selectIndividualEngineerV3(\'' + eng.engineerName.replace(/'/g, "\\'") + '\')" style="background:linear-gradient(135deg, #00e5ff, #00b0ff); border:none; color:#0f172a; padding:6px 14px; border-radius:8px; font-weight:700; cursor:pointer; font-size:11px;">📅 View Calendar</button>' +
+                '</td>' +
+              '</tr>';
+            });
+            allEngTbody.innerHTML = rowHtml;
+          }
+        } else {
+          if (allEngContainer) allEngContainer.style.display = 'none';
+        }
+
+        document.getElementById('v3StatDaysWorked').textContent = res.summary.daysWorked || 0;
+        document.getElementById('v3StatStandbyDays').textContent = res.summary.standbyDays || 0;
+        document.getElementById('v3StatOffDays').textContent = res.summary.offDays || 0;
+        if (document.getElementById('v3StatCarriedOver')) document.getElementById('v3StatCarriedOver').textContent = res.summary.compOffCarriedOver || 0;
+        if (document.getElementById('v3StatEarnedThisMonth')) document.getElementById('v3StatEarnedThisMonth').textContent = res.summary.compOffEarned || 0;
+        document.getElementById('v3StatCompOffBalance').textContent = res.summary.compOffBalance || 0;
+
+        var html = '';
+        res.matrix.forEach(function(row) {
+          var isOff = row.isOfficialOff;
+          var badgeHtml = '';
+
+          if (row.effectiveStatus === 'Work Done') {
+            badgeHtml = '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:4px 10px; border-radius:8px; font-weight:700;">🟢 Work Done</span>';
+          } else if (row.effectiveStatus === 'Standby Day') {
+            badgeHtml = '<span style="background:rgba(245,158,11,0.15); color:#f59e0b; padding:4px 10px; border-radius:8px; font-weight:700;">🟡 Standby Day</span>';
+          } else if (row.effectiveStatus === 'Comp-Off Earned') {
+            badgeHtml = '<span style="background:rgba(139,92,246,0.15); color:#a78bfa; padding:4px 10px; border-radius:8px; font-weight:700;">🟣 Comp-Off Earned</span>';
+          } else if (row.effectiveStatus === 'Comp-Off Declined') {
+            badgeHtml = '<span style="background:rgba(239,68,68,0.15); color:#ef4444; padding:4px 10px; border-radius:8px; font-weight:700;">❌ Comp-Off Declined</span>';
+          } else if (row.effectiveStatus === 'Comp-Off Availed') {
+            badgeHtml = '<span style="background:rgba(244,63,94,0.15); color:#f43f5e; padding:4px 10px; border-radius:8px; font-weight:700;">🔴 Comp-Off Availed</span>';
+          } else {
+            badgeHtml = '<span style="background:rgba(100,116,139,0.15); color:#cbd5e1; padding:4px 10px; border-radius:8px; font-weight:600;">⚪ Official Off</span>';
+          }
+
+          var dayTypeBadge = isOff ? ('<span style="color:#a78bfa; font-weight:700;">' + row.offReason + '</span>') : '<span style="color:#94a3b8;">Regular Workday</span>';
+          var rowBg = isOff ? 'background:rgba(139,92,246,0.03);' : '';
+
+          var cleanEng = (selectedEng || '').replace(/'/g, "\\'");
+          var cleanDate = (row.dateStr || '').replace(/'/g, "\\'");
+          var cleanStatus = (row.effectiveStatus || '').replace(/'/g, "\\'");
+
+          html += '<tr style="' + rowBg + ' border-bottom:1px solid rgba(255,255,255,0.05);">' +
+            '<td style="padding:10px; font-weight:700; color:#fff;">' + row.dateStr + ' <div style="font-size:10px; color:#94a3b8;">' + row.dayName + '</div></td>' +
+            '<td style="padding:10px;">' + dayTypeBadge + '</td>' +
+            '<td style="padding:10px;">' + badgeHtml + (row.isOverridden ? ' <span style="font-size:10px; color:#3b82f6;" title="HOD Overridden">(Overridden)</span>' : '') + '</td>' +
+            '<td style="padding:10px; color:#cbd5e1; font-size:11px;">' + (row.activitySummary || '<span style="color:#64748b;">No activities logged</span>') + '</td>' +
+            '<td style="padding:10px; text-align:right;">' +
+              '<button type="button" onclick="openHODOverrideModal(\'' + cleanEng + '\', \'' + cleanDate + '\', \'' + cleanStatus + '\')" style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); color:#3b82f6; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;">✏️ Override</button>' +
+            '</td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+    }, function(err) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:20px; text-align:center; color:#f43f5e;">Error loading matrix: ' + err.toString() + '</td></tr>';
+    });
+  }
+
+  function openHODOverrideModal(engineer, dateStr, currentStatus) {
+    activeOverrideTarget = { engineer: engineer, dateStr: dateStr };
+    document.getElementById('v3OverrideModalTitle').textContent = 'Override Status for ' + dateStr;
+    document.getElementById('v3OverrideModalSubtitle').textContent = 'Engineer: ' + engineer;
+    var statusSelect = document.getElementById('v3OverrideStatusSelect');
+    if (statusSelect) statusSelect.value = currentStatus || 'AUTO';
+    document.getElementById('v3HODOverrideModal').style.display = 'flex';
+  }
+
+  function closeHODOverrideModal() {
+    document.getElementById('v3HODOverrideModal').style.display = 'none';
+    activeOverrideTarget = { engineer: '', dateStr: '' };
+    var statusSelect = document.getElementById('v3OverrideStatusSelect');
+    if (statusSelect) statusSelect.value = 'AUTO';
+  }
+
+  function saveHODOverrideStatus() {
+    var newStatus = document.getElementById('v3OverrideStatusSelect').value;
+    if (!activeOverrideTarget.engineer || !activeOverrideTarget.dateStr) return;
+
+    runAuthedV4('saveHODStatusOverrideV3', [activeOverrideTarget.engineer, activeOverrideTarget.dateStr, newStatus], function(res) {
+      closeHODOverrideModal();
+      loadHODWorkMatrixV3();
+    }, function(err) {
+      alert("Failed to save override: " + err.toString());
+    });
+  }
+
+  function loadHODEngineersDropdownV3(onDone) {
+    var select = document.getElementById('v3HODWorkEngineerSelect');
+    if (!select) { if (onDone) onDone(); return; }
+
+    var currentVal = select.value || 'ALL';
+
+    runAuthedV4('getEngineersVisibleToCallerV3', [], function(res) {
+      if (res && res.success && Array.isArray(res.engineers)) {
+        if (res.engineers.length === 0) {
+          select.innerHTML = '<option value="ALL">No engineers assigned to you yet - contact Admin</option>';
+        } else {
+          var html = '<option value="ALL"' + (currentVal === 'ALL' ? ' selected' : '') + '>All Engineers Overview</option>';
+          res.engineers.forEach(function(eng) {
+            var isSel = (eng.toLowerCase() === currentVal.toLowerCase()) ? ' selected' : '';
+            html += '<option value="' + eng + '"' + isSel + '>' + eng + ' (Service Engineer)</option>';
+          });
+          select.innerHTML = html;
+        }
+      }
+      if (onDone) onDone();
+    }, function() {
+      if (onDone) onDone();
+    });
+  }
+
+  function initHODWorkMonitorModuleV3() {
+    // This page's DOM is cached and re-shown (not recreated) on every visit
+    // to this tab - reset any modal left open from a previous visit.
+    var overrideModal = document.getElementById('v3HODOverrideModal');
+    if (overrideModal) overrideModal.style.display = 'none';
+
+    var monthSelect = document.getElementById('v3HODWorkMonthSelect');
+    if (monthSelect && !monthSelect.value) {
+      var now = new Date();
+      var mStr = ("0" + (now.getMonth() + 1)).slice(-2);
+      monthSelect.value = now.getFullYear() + "-" + mStr;
+    }
+    // The dropdown starts out with a hardcoded engineer selected (before the
+    // real, HOD-scoped list has loaded) - fetch the matrix only AFTER it's
+    // replaced with the actual scoped options, otherwise the first load
+    // queries whichever engineer happened to be hardcoded in the markup.
+    loadHODEngineersDropdownV3(function() {
+      loadHODWorkMatrixV3();
+    });
+  }
+
+  window.loadHODWorkMatrixV3 = loadHODWorkMatrixV3;
+  window.exportHODWorkReportExcelV3 = exportHODWorkReportExcelV3;
+  window.exportHODWorkReportPDFV3 = exportHODWorkReportPDFV3;
+  window.openHODOverrideModal = openHODOverrideModal;
+  window.closeHODOverrideModal = closeHODOverrideModal;
+  window.initHODWorkMonitorModuleV3 = initHODWorkMonitorModuleV3;
+
+  function compressVideoHDV3(file, targetBitrate = 10000000) {
+    return new Promise((resolve) => {
+      if (!file || file.size <= 8 * 1024 * 1024) {
+        resolve(null);
+        return;
+      }
+
+      const video = document.createElement('video');
+      video.muted = true;
+      video.playsInline = true;
+      video.src = URL.createObjectURL(file);
+
+      video.onloadedmetadata = () => {
+        let width = video.videoWidth || 1920;
+        let height = video.videoHeight || 1080;
+        const maxDim = 1920;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        width = width - (width % 2);
+        height = height - (height % 2);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        let stream;
+        try {
+          stream = canvas.captureStream(30);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        let mimeType = 'video/mp4';
+        if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'video/webm;codecs=vp8';
+          if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = '';
+          }
+        }
+
+        const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: targetBitrate } : { videoBitsPerSecond: targetBitrate };
+        let recorder;
+        try {
+          recorder = new MediaRecorder(stream, recorderOptions);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        const chunks = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = () => {
+          const compressedBlob = new Blob(chunks, { type: mimeType || 'video/mp4' });
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64 = e.target.result.split(',')[1];
+            resolve({ base64, mimeType: mimeType || 'video/mp4', size: compressedBlob.size });
+          };
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(compressedBlob);
+        };
+
+        video.playbackRate = 2.0;
+        try {
+          recorder.start(100);
+        } catch(e) {
+          resolve(null);
+          return;
+        }
+
+        function drawFrame() {
+          if (!video.paused && !video.ended) {
+            ctx.drawImage(video, 0, 0, width, height);
+            requestAnimationFrame(drawFrame);
+          }
+        }
+
+        video.onplay = () => {
+          drawFrame();
+        };
+
+        video.onended = () => {
+          try { recorder.stop(); } catch(e){}
+        };
+
+        video.play().catch(() => resolve(null));
+      };
+
+      video.onerror = () => resolve(null);
+    });
+  }
+</script>

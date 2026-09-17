@@ -1,0 +1,346 @@
+<div class="v2-module-container" style="max-width: 1100px; margin: 0 auto;">
+  <div style="background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); overflow: hidden; display: flex; flex-direction: column;">
+    
+    <!-- Header Banner -->
+    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%); border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 24px 20px; text-align: center;">
+      <h1 style="font-family:'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 4px;">HOD TA/DA Expense Analytics &amp; Claims Audit</h1>
+      <p style="color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">SUPERVISOR TA/DA CLAIMS BREAKDOWN &amp; APPROVAL PORTAL</p>
+    </div>
+
+    <!-- Filter Controls Bar -->
+    <div style="padding: 20px 24px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Select Engineer *</label>
+        <select id="v3HODTadaEngineerSelect" class="v3-input" style="min-width:200px;" onchange="fetchHODTADADashboardV3()">
+          <option value="ALL">All Engineers Overview</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Select Month / Year *</label>
+        <input type="month" id="v3HODTadaMonthSelect" class="v3-input" style="min-width:160px;" onchange="fetchHODTADADashboardV3()">
+      </div>
+
+      <div>
+        <label style="display:block; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:6px;">Claim Cycle *</label>
+        <select id="v3HODTadaCycleSelect" class="v3-input" style="min-width:160px;" onchange="fetchHODTADADashboardV3()">
+          <option value="ALL">Full Month (All Claims)</option>
+          <option value="1-15">Cycle 1: 1st - 15th</option>
+          <option value="16-end">Cycle 2: 16th - End</option>
+        </select>
+      </div>
+
+      <button type="button" onclick="fetchHODTADADashboardV3()" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        🔄 Refresh Claims
+      </button>
+
+      <button type="button" onclick="exportHODTadaExcelV3()" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        📥 Download Excel
+      </button>
+
+      <button type="button" onclick="exportHODTadaPDFV3()" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); padding:10px 16px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        📄 Download PDF
+      </button>
+    </div>
+
+    <!-- Summary Overview Cards -->
+    <div style="padding: 20px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;">
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #10b981; font-weight: 700; text-transform: uppercase;">Total Expenses</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;">₹<span id="v3HODTadaTotalSum">0</span></div>
+      </div>
+
+      <div style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #38bdf8; font-weight: 700; text-transform: uppercase;">Travel (TA) Total</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;">₹<span id="v3HODTadaTravelSum">0</span></div>
+      </div>
+
+      <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #f59e0b; font-weight: 700; text-transform: uppercase;">Food (DA) Total</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;">₹<span id="v3HODTadaFoodSum">0</span></div>
+      </div>
+
+      <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #60a5fa; font-weight: 700; text-transform: uppercase;">Accommodation</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;">₹<span id="v3HODTadaStaySum">0</span></div>
+      </div>
+
+      <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 14px; padding: 12px; text-align: center;">
+        <div style="font-size: 10px; color: #c084fc; font-weight: 700; text-transform: uppercase;">Consumables</div>
+        <div style="font-size: 22px; font-weight: 800; color: #fff; margin-top: 2px;">₹<span id="v3HODTadaConsSum">0</span></div>
+      </div>
+    </div>
+
+    <!-- Itemized Claims Grid Table -->
+    <div style="padding: 0 24px 24px 24px; overflow-x: auto;">
+      <h3 style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 12px;">📑 Engineer Submitted Claims Itemized Breakdown</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; color: #cbd5e1; text-align: left;">
+        <thead>
+          <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <th style="padding: 10px; color: #94a3b8; width: 110px;">Claim ID / Date</th>
+            <th style="padding: 10px; color: #94a3b8; width: 140px;">Engineer Name</th>
+            <th style="padding: 10px; color: #94a3b8;">Purpose / Details</th>
+            <th style="padding: 10px; color: #38bdf8; text-align: right;">Travel (₹)</th>
+            <th style="padding: 10px; color: #f59e0b; text-align: right;">Food (₹)</th>
+            <th style="padding: 10px; color: #60a5fa; text-align: right;">Stay (₹)</th>
+            <th style="padding: 10px; color: #c084fc; text-align: right;">Cons. (₹)</th>
+            <th style="padding: 10px; color: #10b981; text-align: right; width: 110px;">Total (₹)</th>
+            <th id="v3TadaActionHeader" style="padding: 10px; color: #94a3b8; text-align: right; width: 130px; display:none;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="v3TadaLogBody">
+          <tr>
+            <td colspan="8" style="padding: 20px; text-align: center; color: #94a3b8;">Loading TA/DA claims...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var cachedHODTadaClaimsV3 = [];
+
+  function loadHODTadaEngineersDropdownV3() {
+    var select = document.getElementById('v3HODTadaEngineerSelect');
+    if (!select) return;
+    var currentVal = select.value || 'ALL';
+
+    runAuthedV4('getEngineersVisibleToCallerV3', [], function(res) {
+      if (res && res.success && Array.isArray(res.engineers)) {
+        if (res.engineers.length === 0) {
+          select.innerHTML = '<option value="ALL">No engineers assigned to you yet - contact Admin</option>';
+          return;
+        }
+        var html = '<option value="ALL"' + (currentVal === 'ALL' ? ' selected' : '') + '>All Engineers Overview</option>';
+        res.engineers.forEach(function(eng) {
+          var isSel = (eng.toLowerCase() === currentVal.toLowerCase()) ? ' selected' : '';
+          html += '<option value="' + eng + '"' + isSel + '>' + eng + ' (Service Engineer)</option>';
+        });
+        select.innerHTML = html;
+      }
+    });
+  }
+
+  function fetchHODTADADashboardV3() {
+    var engSelect = document.getElementById('v3HODTadaEngineerSelect');
+    var monthSelect = document.getElementById('v3HODTadaMonthSelect');
+    var cycleSelect = document.getElementById('v3HODTadaCycleSelect');
+    var tbody = document.getElementById('v3TadaLogBody');
+    if (!tbody) return;
+
+    if (monthSelect && !monthSelect.value) {
+      var now = new Date();
+      var mStr = ("0" + (now.getMonth() + 1)).slice(-2);
+      monthSelect.value = now.getFullYear() + "-" + mStr;
+    }
+
+    var selectedEng = engSelect ? engSelect.value : 'ALL';
+    var selectedMonth = monthSelect ? monthSelect.value : '';
+    var selectedCycle = cycleSelect ? cycleSelect.value : 'ALL';
+
+    tbody.innerHTML = '<tr><td colspan="8" style="padding:20px; text-align:center; color:#94a3b8;">Calculating TA/DA expense breakdown for ' + selectedEng + ' (' + selectedMonth + ')...</td></tr>';
+
+    runAuthedV4('getEngineerTadaHistoryV3', [selectedEng, selectedMonth], function(res) {
+        var rawClaims = (res && res.claims) ? res.claims : [];
+
+        var filtered = rawClaims.filter(function(c) {
+          if (selectedCycle === '1-15') return c.dayNum <= 15;
+          if (selectedCycle === '16-end') return c.dayNum > 15;
+          return true;
+        });
+
+        cachedHODTadaClaimsV3 = filtered;
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="padding:20px; text-align:center; color:#94a3b8;">No TA/DA claims found for ' + selectedEng + ' (' + selectedMonth + ').</td></tr>';
+          document.getElementById('v3HODTadaTotalSum').textContent = '0';
+          document.getElementById('v3HODTadaTravelSum').textContent = '0';
+          document.getElementById('v3HODTadaFoodSum').textContent = '0';
+          document.getElementById('v3HODTadaStaySum').textContent = '0';
+          document.getElementById('v3HODTadaConsSum').textContent = '0';
+          return;
+        }
+
+        var totalSum = 0, travelSum = 0, foodSum = 0, staySum = 0, consSum = 0;
+        var html = '';
+        var isAdminV3 = window.currentUserV4 && window.currentUserV4.role === 'Admin';
+        var actionHeaderV3 = document.getElementById('v3TadaActionHeader');
+        if (actionHeaderV3) actionHeaderV3.style.display = isAdminV3 ? 'table-cell' : 'none';
+
+        filtered.forEach(function(l) {
+          var tAmt = Number(l.travelAmt) || 0;
+          var fAmt = Number(l.foodAmt) || 0;
+          var sAmt = Number(l.stayAmt) || 0;
+          var cAmt = Number(l.consAmt) || 0;
+          var grand = Number(l.dayTotal) || (tAmt + fAmt + sAmt + cAmt);
+
+          totalSum += grand;
+          travelSum += tAmt;
+          foodSum += fAmt;
+          staySum += sAmt;
+          consSum += cAmt;
+
+          html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">' +
+            '<td style="padding:10px; font-weight:700; color:#38bdf8;">' + (l.claimId || 'CLM-LOG') + '<div style="font-size:10px; color:#94a3b8;">' + (l.dateStr || '') + '</div></td>' +
+            '<td style="padding:10px; font-weight:600; color:#fff;">' + (l.engineer || 'Field Engineer') + '</td>' +
+            '<td style="padding:10px; color:#cbd5e1; font-size:11px; max-width:220px; overflow:hidden; text-overflow:ellipsis;">' + (l.summary || 'Expense Claim') + '</td>' +
+            '<td style="padding:10px; text-align:right; font-weight:600; color:#38bdf8;">₹' + tAmt + '</td>' +
+            '<td style="padding:10px; text-align:right; font-weight:600; color:#f59e0b;">₹' + fAmt + '</td>' +
+            '<td style="padding:10px; text-align:right; font-weight:600; color:#60a5fa;">₹' + sAmt + '</td>' +
+            '<td style="padding:10px; text-align:right; font-weight:600; color:#c084fc;">₹' + cAmt + '</td>' +
+            '<td style="padding:10px; text-align:right; font-weight:800; color:#10b981; font-size:13px;">₹' + grand + '</td>' +
+            (isAdminV3 ? '<td style="padding:10px; text-align:right; white-space:nowrap;">' +
+              '<button onclick="openGenericEditModalV4(\'tada\', \'' + (l.recordId || '') + '\', \'Edit TA/DA Claim\', fetchHODTADADashboardV3)" style="background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); color:#06b6d4; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer;">Edit</button> ' +
+              '<button onclick="adminDeleteRecordV4(\'tada\', \'' + (l.recordId || '') + '\', \'this TA/DA claim\', fetchHODTADADashboardV3)" style="background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.3); color:#f43f5e; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:700; cursor:pointer;">Delete</button>' +
+              '</td>' : '') +
+          '</tr>';
+        });
+
+        document.getElementById('v3HODTadaTotalSum').textContent = totalSum.toLocaleString();
+        document.getElementById('v3HODTadaTravelSum').textContent = travelSum.toLocaleString();
+        document.getElementById('v3HODTadaFoodSum').textContent = foodSum.toLocaleString();
+        document.getElementById('v3HODTadaStaySum').textContent = staySum.toLocaleString();
+        document.getElementById('v3HODTadaConsSum').textContent = consSum.toLocaleString();
+
+        tbody.innerHTML = html;
+    }, function(err) {
+      tbody.innerHTML = '<tr><td colspan="8" style="padding:20px; text-align:center; color:#f43f5e;">Error loading TA/DA claims: ' + err.toString() + '</td></tr>';
+    });
+  }
+
+  function exportHODTadaExcelV3() {
+    var engSelect = document.getElementById('v3HODTadaEngineerSelect');
+    var monthSelect = document.getElementById('v3HODTadaMonthSelect');
+    var engName = engSelect ? engSelect.value : 'Engineer';
+    var monthVal = monthSelect ? monthSelect.value : new Date().toISOString().substring(0, 7);
+
+    if (!cachedHODTadaClaimsV3 || cachedHODTadaClaimsV3.length === 0) {
+      alert("No TA/DA claims available to export for " + monthVal);
+      return;
+    }
+
+    var csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Claim ID,Date,Engineer,Purpose / Details,Travel (INR),Food (INR),Stay (INR),Consumables (INR),Total Claim (INR)\n";
+
+    cachedHODTadaClaimsV3.forEach(function(l) {
+      var cid = l.claimId || "";
+      var dStr = l.dateStr || "";
+      var eng = (l.engineer || "").replace(/"/g, '""');
+      var summ = (l.summary || "").replace(/"/g, '""');
+      var tAmt = l.travelAmt || 0;
+      var fAmt = l.foodAmt || 0;
+      var sAmt = l.stayAmt || 0;
+      var cAmt = l.consAmt || 0;
+      var grand = l.dayTotal || (tAmt + fAmt + sAmt + cAmt);
+
+      csvContent += '"' + cid + '","' + dStr + '","' + eng + '","' + summ + '","' + tAmt + '","' + fAmt + '","' + sAmt + '","' + cAmt + '","' + grand + '"\n';
+    });
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "HOD_TADA_Expenses_Report_" + engName.replace(/\s+/g, '_') + "_" + monthVal + ".csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function exportHODTadaPDFV3() {
+    var engSelect = document.getElementById('v3HODTadaEngineerSelect');
+    var monthSelect = document.getElementById('v3HODTadaMonthSelect');
+    var engName = engSelect ? engSelect.value : 'Engineer';
+    var monthVal = monthSelect ? monthSelect.value : new Date().toISOString().substring(0, 7);
+
+    if (!cachedHODTadaClaimsV3 || cachedHODTadaClaimsV3.length === 0) {
+      alert("No TA/DA claims available to print PDF for " + monthVal);
+      return;
+    }
+
+    var printWin = window.open('', '_blank', 'width=950,height=750');
+    if (!printWin) {
+      alert("Please allow popups to download/print PDF report.");
+      return;
+    }
+
+    var totalSum = 0, travelSum = 0, foodSum = 0, staySum = 0, consSum = 0;
+    var rowsHtml = '';
+
+    cachedHODTadaClaimsV3.forEach(function(l) {
+      var tAmt = Number(l.travelAmt) || 0;
+      var fAmt = Number(l.foodAmt) || 0;
+      var sAmt = Number(l.stayAmt) || 0;
+      var cAmt = Number(l.consAmt) || 0;
+      var grand = Number(l.dayTotal) || (tAmt + fAmt + sAmt + cAmt);
+
+      totalSum += grand;
+      travelSum += tAmt;
+      foodSum += fAmt;
+      staySum += sAmt;
+      consSum += cAmt;
+
+      rowsHtml += '<tr>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold;">' + (l.claimId || '') + '<div style="font-size:10px; color:#666;">' + (l.dateStr || '') + '</div></td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold;">' + (l.engineer || 'Field Engineer') + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd;">' + (l.summary || 'Expense Claim') + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹' + tAmt + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹' + fAmt + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹' + sAmt + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">₹' + cAmt + '</td>' +
+        '<td style="padding:8px; border-bottom:1px solid #ddd; text-align:right; font-weight:bold; color:#10b981;">₹' + grand + '</td>' +
+      '</tr>';
+    });
+
+    var pdfContent = '<html><head><title>TA/DA Claims Audit Report - ' + engName + ' (' + monthVal + ')</title>' +
+      '<style>' +
+        'body { font-family: Arial, sans-serif; margin: 20px; color: #333; }' +
+        '.header { text-align: center; border-bottom: 2px solid #10b981; padding-bottom: 10px; margin-bottom: 20px; }' +
+        '.header h1 { margin: 0; color: #10b981; font-size: 22px; }' +
+        '.header p { margin: 4px 0 0 0; color: #666; font-size: 12px; font-weight: bold; }' +
+        '.summary-grid { display: flex; gap: 10px; margin-bottom: 20px; text-align: center; }' +
+        '.card { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; background: #f8fafc; }' +
+        '.card-title { font-size: 10px; color: #64748b; font-weight: bold; text-transform: uppercase; }' +
+        '.card-val { font-size: 16px; font-weight: bold; color: #0f172a; margin-top: 2px; }' +
+        'table.report-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }' +
+        'table.report-table th { background: #f1f5f9; padding: 8px; border-bottom: 2px solid #cbd5e1; text-align: left; }' +
+        '@media print { body { margin: 0; } }' +
+      '</style>' +
+      '</head><body>' +
+      '<div class="header">' +
+      '<h1>GO EC Service & Maintenance</h1>' +
+      '<p>Engineer TA/DA Claims Audit Report</p>' +
+      '</div>' +
+      '<div style="margin-bottom:15px; font-size:12px;">' +
+      '<strong>Engineer / Selection:</strong> ' + engName + ' &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Month/Year:</strong> ' + monthVal + ' &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Total Claims:</strong> ' + cachedHODTadaClaimsV3.length + ' &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Generated:</strong> ' + new Date().toLocaleDateString() +
+      '</div>' +
+      '<div class="summary-grid">' +
+      '<div class="card"><div class="card-title">Travel Total</div><div class="card-val" style="color:#0284c7;">₹' + travelSum.toLocaleString() + '</div></div>' +
+      '<div class="card"><div class="card-title">Food Total</div><div class="card-val" style="color:#d97706;">₹' + foodSum.toLocaleString() + '</div></div>' +
+      '<div class="card"><div class="card-title">Accommodation</div><div class="card-val" style="color:#2563eb;">₹' + staySum.toLocaleString() + '</div></div>' +
+      '<div class="card"><div class="card-title">Consumables</div><div class="card-val" style="color:#9333ea;">₹' + consSum.toLocaleString() + '</div></div>' +
+      '<div class="card" style="border-color:#10b981; background:#ecfdf5;"><div class="card-title" style="color:#059669;">Total Expenses</div><div class="card-val" style="color:#059669;">₹' + totalSum.toLocaleString() + '</div></div>' +
+      '</div>' +
+      '<table class="report-table">' +
+      '<thead><tr>' +
+      '<th>Claim ID / Date</th>' +
+      '<th>Engineer</th>' +
+      '<th>Purpose / Details</th>' +
+      '<th style="text-align:right;">Travel (₹)</th>' +
+      '<th style="text-align:right;">Food (₹)</th>' +
+      '<th style="text-align:right;">Stay (₹)</th>' +
+      '<th style="text-align:right;">Cons. (₹)</th>' +
+      '<th style="text-align:right;">Total (₹)</th>' +
+      '</tr></thead><tbody>' + rowsHtml + '</tbody>' +
+      '</table>' +
+      '</body></html>';
+
+    printWin.document.write(pdfContent);
+    printWin.document.close();
+    setTimeout(function() { try { printWin.print(); } catch(e){} }, 250);
+  }
+
+  // Auto-initialize HOD TA/DA controls and data
+  loadHODTadaEngineersDropdownV3();
+  fetchHODTADADashboardV3();
+</script>

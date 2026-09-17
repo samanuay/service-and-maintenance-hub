@@ -1,0 +1,224 @@
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+  <h2 style="font-family:'Space Grotesk'; font-size:20px; color:#fff;">Roles &amp; Access Control</h2>
+  <button onclick="openRoleModalV3()" style="background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%) !important; color: #ffffff !important; border: none !important; padding: 10px 20px !important; font-size: 13px !important; font-weight: 700 !important; border-radius: 8px !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4) !important; transition: all 0.2s ease !important; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">+ Create New Role</button>
+</div>
+
+<p style="font-size:12px; color:var(--text-tertiary); margin:-8px 0 18px 0; max-width:640px;">Roles control which portal pages a user can open. Engineer, HOD, and Admin are built-in and can't be renamed or deleted; Admin always has full access to every page. Create a custom role (e.g. "HR") to limit someone to just the pages they need.</p>
+
+<div class="v4-table-card" style="padding:16px; background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius-lg); overflow-x:auto;">
+  <table class="v4-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+    <thead>
+      <tr>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Role</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Pages Allowed</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Type</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Action</th>
+      </tr>
+    </thead>
+    <tbody id="v3RolesTableBody">
+      <tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-tertiary);">Loading roles...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Create/Edit Role Modal -->
+<div id="v3RoleOverlay" class="v4-login-overlay" style="display:none; position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(8,12,21,0.85), rgba(4,6,11,0.95)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;">
+  <div class="v4-login-card" style="width:460px; max-height:85vh; overflow-y:auto; text-align:left; border: 1px solid var(--glass-border); border-radius:var(--radius-lg); padding:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); padding-bottom:12px; margin-bottom:16px;">
+      <h3 id="v3RoleModalTitle" style="font-family:'Space Grotesk'; font-size:18px; color:#fff; margin:0;">&#128273; Create New Role</h3>
+      <button type="button" onclick="closeRoleModalV3()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">&#10005;</button>
+    </div>
+
+    <form onsubmit="handleV3SaveRole(event); return false;" style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Role Name *</label>
+        <input type="text" id="v3_role_name" class="v3-input" required placeholder="e.g. HR" style="margin-bottom:0 !important;">
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Pages this role can access *</label>
+        <div id="v3_role_pages_checklist" style="display:flex; flex-direction:column; gap:2px; min-height:120px; max-height:280px; overflow-y:auto; border:1px solid var(--glass-border); border-radius:8px; padding:10px; background:rgba(0,0,0,0.15);"></div>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button type="button" onclick="closeRoleModalV3()" style="flex:1; background:rgba(255,255,255,0.04) !important; border:1px solid var(--glass-border) !important; color:var(--text-secondary) !important; border-radius:var(--radius-md) !important; font-weight:600 !important; cursor:pointer;">Cancel</button>
+        <button type="submit" id="v3RoleSaveBtn" style="flex:1; background:linear-gradient(135deg, var(--cyan-500) 0%, var(--violet-400) 100%) !important; color:#fff !important; font-weight:700 !important; border-radius:var(--radius-md) !important; cursor:pointer;">Save Role</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Friendly labels for every logical page id - keep in sync with Home_V4.html's _v4Titles
+  var V3_PAGE_LABELS = {
+    dashboard: "Dashboard Overview",
+    commissioning: "Station Commissioning Form",
+    pm_civil: "PM: Electrical & Civil Maintenance",
+    pm_charger: "PM: Charger Maintenance",
+    daily_work: "Daily Work Log & Maintenance",
+    weekly_pending: "Weekly Pending Issues",
+    tada: "TA/DA Claims Submission",
+    sim_inventory: "SIM Inventory & Asset Tracking",
+    pm_report: "Station PM Audit Reports",
+    hod_comm: "Commissioning Audit Reports",
+    hod_weekly: "Weekly Status Updates",
+    hod_tada: "TA/DA Analytics & Approval Dashboard",
+    hod_work_monitor: "Engineer Work & Comp-Off Monitor",
+    users: "User Management",
+    roles: "Roles & Access Control",
+    stations: "Stations Master Data",
+    audit_log: "Audit Log"
+  };
+
+  var v3RolesCacheV3 = [];
+  var v3RoleEditTargetV3 = null; // null = creating new; string = editing this role name
+  // The authoritative list of every grantable page id, from the server's
+  // ALL_PORTAL_PAGES_V3 - never hardcode this list here again, or a page
+  // added later (like stations/audit_log were) silently has no checkbox and
+  // gets stripped from a role's permissions the next time it's saved.
+  var v3AllPagesV3 = Object.keys(V3_PAGE_LABELS);
+
+  function fetchRolesV3() {
+    // This page's DOM is cached and re-shown (not recreated) on every visit
+    // to this tab - reset any modal left open from a previous visit.
+    var roleOverlay = document.getElementById('v3RoleOverlay');
+    if (roleOverlay) roleOverlay.style.display = 'none';
+
+    var tbody = document.getElementById('v3RolesTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-tertiary);">Loading roles...</td></tr>';
+
+    runAuthedV4('getRolesListV3', [], res => {
+      if (!res || !res.success) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#f43f5e; padding:20px; text-align:center;">' + (res ? res.message : 'Failed to load roles') + '</td></tr>';
+        return;
+      }
+      v3RolesCacheV3 = res.roles || [];
+      if (res.allPages && res.allPages.length) v3AllPagesV3 = res.allPages;
+
+      if (!v3RolesCacheV3.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-tertiary);">No roles found.</td></tr>';
+        return;
+      }
+
+      var html = '';
+      v3RolesCacheV3.forEach(r => {
+        var pagesText = r.allowedPages.indexOf('ALL') !== -1
+          ? 'All pages'
+          : r.allowedPages.map(p => V3_PAGE_LABELS[p] || p).join(', ');
+
+        var typeBadge = r.isSystemRole
+          ? '<span class="v4-badge v4-badge-amber">Built-in</span>'
+          : '<span class="v4-badge v4-badge-green">Custom</span>';
+
+        var actions = '<button onclick="openRoleModalV3(\'' + r.roleName + '\')" style="background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); color:#06b6d4; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; margin-right:6px;">Edit</button>';
+        if (r.isSystemRole) {
+          actions += '<span style="color:var(--text-tertiary); font-size:11px; font-weight:600;">Protected</span>';
+        } else {
+          actions += '<button onclick="deleteRoleAccountV3(\'' + r.roleName + '\')" style="background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.3); color:#f43f5e; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">Delete</button>';
+        }
+
+        html += '<tr>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); font-weight:600; color:#fff;">' + r.roleName + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-secondary); font-size:12px; max-width:320px;">' + pagesText + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03);">' + typeBadge + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); white-space:nowrap;">' + actions + '</td>' +
+          '</tr>';
+      });
+      tbody.innerHTML = html;
+    }, err => {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:#f43f5e; padding:20px; text-align:center;">Error: ' + err.toString() + '</td></tr>';
+    });
+  }
+  window.fetchRolesV3 = fetchRolesV3;
+
+  function renderPageChecklistV3(checkedPages) {
+    var container = document.getElementById('v3_role_pages_checklist');
+    var checkedSet = {};
+    (checkedPages || []).forEach(p => { checkedSet[p] = true; });
+
+    var rows = v3AllPagesV3.map(pageId => {
+      var isChecked = !!checkedSet[pageId];
+      return '<label style="display:flex; align-items:center; gap:10px; font-size:13px; color:#e2e8f0; cursor:pointer; padding:6px 4px; border-radius:6px;" onmouseover="this.style.background=\'rgba(255,255,255,0.04)\'" onmouseout="this.style.background=\'transparent\'">' +
+        '<input type="checkbox" class="v3-role-page-chk" value="' + pageId + '" style="width:16px; height:16px; accent-color:#06b6d4; flex-shrink:0;"' + (isChecked ? ' checked' : '') + '>' +
+        '<span>' + (V3_PAGE_LABELS[pageId] || pageId) + '</span>' +
+        '</label>';
+    });
+
+    container.innerHTML = rows.join('');
+    console.log('renderPageChecklistV3: rendered ' + rows.length + ' page checkboxes into #v3_role_pages_checklist');
+  }
+
+  function openRoleModalV3(roleName) {
+    var title = document.getElementById('v3RoleModalTitle');
+    var nameInput = document.getElementById('v3_role_name');
+
+    if (roleName) {
+      var existing = v3RolesCacheV3.find(r => r.roleName === roleName);
+      v3RoleEditTargetV3 = roleName;
+      title.textContent = 'Edit Role: ' + roleName;
+      nameInput.value = roleName;
+      nameInput.disabled = !!(existing && existing.isSystemRole);
+      renderPageChecklistV3(existing ? existing.allowedPages : []);
+    } else {
+      v3RoleEditTargetV3 = null;
+      title.textContent = 'Create New Role';
+      nameInput.value = '';
+      nameInput.disabled = false;
+      renderPageChecklistV3(['dashboard']);
+    }
+
+    document.getElementById('v3RoleOverlay').style.display = 'flex';
+  }
+  window.openRoleModalV3 = openRoleModalV3;
+
+  function closeRoleModalV3() {
+    document.getElementById('v3RoleOverlay').style.display = 'none';
+  }
+  window.closeRoleModalV3 = closeRoleModalV3;
+
+  function handleV3SaveRole(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    var name = document.getElementById('v3_role_name').value.trim();
+    var checked = Array.from(document.querySelectorAll('.v3-role-page-chk:checked')).map(el => el.value);
+    var btn = document.getElementById('v3RoleSaveBtn');
+
+    if (!name) { alert('Role name is required.'); return; }
+    if (!checked.length) { alert('Select at least one page.'); return; }
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    runAuthedV4('saveRoleV3', [name, checked, v3RoleEditTargetV3], res => {
+      btn.textContent = 'Save Role';
+      btn.disabled = false;
+      if (res && res.success) {
+        closeRoleModalV3();
+        if (window.showSuccessOverlayV3) {
+          showSuccessOverlayV3("Role Saved!", res.message, function() { fetchRolesV3(); });
+        } else {
+          alert(res.message);
+          fetchRolesV3();
+        }
+      } else {
+        alert('Failed: ' + (res ? res.message : 'Could not save role'));
+      }
+    }, err => {
+      btn.textContent = 'Save Role';
+      btn.disabled = false;
+      alert('Failed: ' + err.toString());
+    });
+  }
+  window.handleV3SaveRole = handleV3SaveRole;
+
+  function deleteRoleAccountV3(roleName) {
+    if (!confirm("Are you sure you want to delete the role '" + roleName + "'?")) return;
+
+    runAuthedV4('deleteRoleV3', [roleName], res => {
+      alert(res.message);
+      if (res.success) fetchRolesV3();
+    }, err => {
+      alert('Error: ' + err.toString());
+    });
+  }
+  window.deleteRoleAccountV3 = deleteRoleAccountV3;
+</script>

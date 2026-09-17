@@ -1,0 +1,90 @@
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+  <h2 style="font-family:'Space Grotesk'; font-size:20px; color:#fff;">Audit Log</h2>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <input type="text" id="v3AuditFilterInput" placeholder="Filter by actor, sheet, or record..." class="v3-input" style="margin-bottom:0 !important; width:260px;" oninput="renderAuditLogTableV3()">
+    <button onclick="fetchAuditLogV3()" style="background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); color:#06b6d4; padding:8px 14px; border-radius:8px; font-size:12px; cursor:pointer;">Refresh</button>
+  </div>
+</div>
+
+<p style="font-size:12px; color:var(--text-tertiary); margin:-8px 0 18px 0;">Every edit and delete made from the portal's admin tools, newest first. Showing up to the most recent 500 entries.</p>
+
+<div class="v4-table-card" style="padding:16px; background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius-lg); overflow-x:auto;">
+  <table class="v4-table" style="width:100%; border-collapse:collapse; font-size:12px;">
+    <thead>
+      <tr>
+        <th style="color:var(--text-tertiary); text-align:left; padding:10px 14px;">When</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:10px 14px;">Actor</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:10px 14px;">Action</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:10px 14px;">Sheet</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:10px 14px;">Field</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:10px 14px;">Old Value</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:10px 14px;">New Value</th>
+      </tr>
+    </thead>
+    <tbody id="v3AuditLogTableBody">
+      <tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-tertiary);">Loading audit log...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  var v3AuditLogCacheV3 = [];
+
+  function escapeHtmlV3(s) {
+    return (s || '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function fetchAuditLogV3() {
+    var tbody = document.getElementById('v3AuditLogTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-tertiary);">Loading audit log...</td></tr>';
+
+    runAuthedV4('getAuditLogV3', [], res => {
+      if (!res || !res.success) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:#f43f5e; padding:20px; text-align:center;">' + (res ? res.message : 'Failed to load') + '</td></tr>';
+        return;
+      }
+      v3AuditLogCacheV3 = res.entries || [];
+      renderAuditLogTableV3();
+    }, err => {
+      tbody.innerHTML = '<tr><td colspan="7" style="color:#f43f5e; padding:20px; text-align:center;">Error: ' + err.toString() + '</td></tr>';
+    });
+  }
+  window.fetchAuditLogV3 = fetchAuditLogV3;
+
+  function renderAuditLogTableV3() {
+    var tbody = document.getElementById('v3AuditLogTableBody');
+    var filterEl = document.getElementById('v3AuditFilterInput');
+    var filter = (filterEl ? filterEl.value : '').trim().toLowerCase();
+
+    var rows = v3AuditLogCacheV3;
+    if (filter) {
+      rows = rows.filter(e =>
+        (e.actorUsername || '').toLowerCase().indexOf(filter) !== -1 ||
+        (e.actorFullName || '').toLowerCase().indexOf(filter) !== -1 ||
+        (e.sheetKey || '').toLowerCase().indexOf(filter) !== -1 ||
+        (e.recordId || '').toLowerCase().indexOf(filter) !== -1
+      );
+    }
+
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--text-tertiary);">No audit entries yet.</td></tr>';
+      return;
+    }
+
+    var html = rows.map(e => {
+      var actionColor = e.action === 'Delete' ? '#f43f5e' : '#06b6d4';
+      return '<tr>' +
+        '<td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-tertiary); white-space:nowrap;">' + escapeHtmlV3(e.timestamp) + '</td>' +
+        '<td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03); color:#fff;">' + escapeHtmlV3(e.actorFullName || e.actorUsername) + '</td>' +
+        '<td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03); color:' + actionColor + '; font-weight:700;">' + escapeHtmlV3(e.action) + '</td>' +
+        '<td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-secondary);">' + escapeHtmlV3(e.sheetKey) + '</td>' +
+        '<td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-secondary);">' + escapeHtmlV3(e.fieldChanged) + '</td>' +
+        '<td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-tertiary); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escapeHtmlV3(e.oldValue) + '">' + escapeHtmlV3(e.oldValue) + '</td>' +
+        '<td style="padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.03); color:#10b981; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escapeHtmlV3(e.newValue) + '">' + escapeHtmlV3(e.newValue) + '</td>' +
+        '</tr>';
+    }).join('');
+    tbody.innerHTML = html;
+  }
+  window.renderAuditLogTableV3 = renderAuditLogTableV3;
+</script>

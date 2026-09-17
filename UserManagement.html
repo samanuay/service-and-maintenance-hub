@@ -1,0 +1,455 @@
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+  <h2 style="font-family:'Space Grotesk'; font-size:20px; color:#fff;">User Account Management</h2>
+  <button onclick="openAddUserModalV3()" style="background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%) !important; color: #ffffff !important; border: none !important; padding: 10px 20px !important; font-size: 13px !important; font-weight: 700 !important; border-radius: 8px !important; cursor: pointer !important; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4) !important; transition: all 0.2s ease !important; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">+ Create User Account</button>
+</div>
+
+<div class="v4-table-card" style="padding:16px; background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius-lg); overflow-x:auto;">
+  <table class="v4-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+    <thead>
+      <tr>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Username</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Full Name</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">System Role</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Action</th>
+      </tr>
+    </thead>
+    <tbody id="v3UsersTableBody">
+      <tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-tertiary);">Loading user accounts...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Add User Modal -->
+<div id="v3AddUserOverlay" class="v4-login-overlay" style="display:none; position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(8,12,21,0.85), rgba(4,6,11,0.95)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;">
+  <div class="v4-login-card" style="width:400px; text-align:left; border: 1px solid var(--glass-border); border-radius:var(--radius-lg); padding:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); padding-bottom:12px; margin-bottom:16px;">
+      <h3 style="font-family:'Space Grotesk'; font-size:18px; color:#fff; margin:0;">👤 Create New User Account</h3>
+      <button type="button" onclick="closeAddUserModalV3()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <form onsubmit="handleV3AddUser(event); return false;" style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Username *</label>
+        <input type="text" id="v3_au_user" class="v3-input" required placeholder="e.g. nithin" style="margin-bottom:0 !important;">
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Password *</label>
+        <input type="password" id="v3_au_pass" class="v3-input" required placeholder="Default password" style="margin-bottom:0 !important;">
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Full Name *</label>
+        <input type="text" id="v3_au_name" class="v3-input" required placeholder="e.g. Nithin" style="margin-bottom:0 !important;">
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Role *</label>
+        <select id="v3_au_role" class="v3-input" required style="margin-bottom:0 !important;">
+          <option value="">Loading roles...</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button type="button" onclick="closeAddUserModalV3()" style="flex:1; background:rgba(255,255,255,0.04) !important; border:1px solid var(--glass-border) !important; color:var(--text-secondary) !important; border-radius:var(--radius-md) !important; font-weight:600 !important; cursor:pointer;">Cancel</button>
+        <button type="submit" id="v3AuBtn" style="flex:1; background:linear-gradient(135deg, var(--cyan-500) 0%, var(--violet-400) 100%) !important; color:#fff !important; font-weight:700 !important; border-radius:var(--radius-md) !important; cursor:pointer;">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Assign Engineers to HOD Modal -->
+<div id="v3AssignEngOverlay" class="v4-login-overlay" style="display:none; position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(8,12,21,0.85), rgba(4,6,11,0.95)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;">
+  <div class="v4-login-card" style="width:440px; max-height:85vh; overflow-y:auto; text-align:left; border: 1px solid var(--glass-border); border-radius:var(--radius-lg); padding:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); padding-bottom:12px; margin-bottom:16px;">
+      <h3 id="v3AssignEngTitle" style="font-family:'Space Grotesk'; font-size:18px; color:#fff; margin:0;">👥 Assign Engineers</h3>
+      <button type="button" onclick="closeAssignEngineersModalV3()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:12px; color:var(--text-tertiary); margin:0 0 14px 0;">This HOD will only see stations, PM reports, and dashboards for the engineers checked below. Leave none checked and they'll see nothing until you assign someone.</p>
+    <label style="display:flex; align-items:center; gap:10px; font-size:13px; color:#fbbf24; font-weight:700; cursor:pointer; padding:8px 10px; border-radius:8px; background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.25); margin-bottom:10px;">
+      <input type="checkbox" id="v3AssignEngSelectAll" onchange="handleToggleSelectAllEngineersV3()" style="width:16px; height:16px; accent-color:#fbbf24; flex-shrink:0;">
+      <span>Select All Engineers (current &amp; future)</span>
+    </label>
+    <div id="v3AssignEngChecklist" style="display:flex; flex-direction:column; gap:2px; min-height:100px; max-height:280px; overflow-y:auto; border:1px solid var(--glass-border); border-radius:8px; padding:10px; background:rgba(0,0,0,0.15); margin-bottom:16px;">
+      <div style="color:var(--text-tertiary); font-size:12px;">Loading engineers...</div>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <button type="button" onclick="closeAssignEngineersModalV3()" style="flex:1; background:rgba(255,255,255,0.04) !important; border:1px solid var(--glass-border) !important; color:var(--text-secondary) !important; border-radius:var(--radius-md) !important; font-weight:600 !important; cursor:pointer;">Cancel</button>
+      <button type="button" id="v3AssignEngSaveBtn" onclick="handleSaveAssignedEngineersV3()" style="flex:1; background:linear-gradient(135deg, var(--cyan-500) 0%, var(--violet-400) 100%) !important; color:#fff !important; font-weight:700 !important; border-radius:var(--radius-md) !important; cursor:pointer;">Save Assignment</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var v3AssignEngTargetHodV3 = null;
+
+  function openAssignEngineersModalV3(hodUsername, hodFullName) {
+    v3AssignEngTargetHodV3 = hodUsername;
+    document.getElementById('v3AssignEngTitle').textContent = '👥 Assign Engineers to ' + hodFullName;
+    document.getElementById('v3AssignEngChecklist').innerHTML = '<div style="color:var(--text-tertiary); font-size:12px;">Loading engineers...</div>';
+    document.getElementById('v3AssignEngSelectAll').checked = false;
+    document.getElementById('v3AssignEngOverlay').style.display = 'flex';
+
+    runAuthedV4('getAllHodsWithAssignmentsV3', [], hodRes => {
+      var currentAssigned = [];
+      if (hodRes && hodRes.success) {
+        var match = (hodRes.hods || []).find(h => h.username === hodUsername);
+        if (match) currentAssigned = match.assignedEngineers || [];
+      }
+
+      var isAllSentinel = currentAssigned.length === 1 && currentAssigned[0].toLowerCase() === 'all';
+
+      runAuthedV4('getAllEngineersListV3', [], engRes => {
+        var engineers = (engRes && engRes.engineers) ? engRes.engineers : [];
+        var checkedSet = {};
+        currentAssigned.forEach(e => { checkedSet[e.toLowerCase()] = true; });
+
+        if (!engineers.length) {
+          document.getElementById('v3AssignEngChecklist').innerHTML = '<div style="color:var(--text-tertiary); font-size:12px;">No engineers found.</div>';
+          return;
+        }
+
+        document.getElementById('v3AssignEngChecklist').innerHTML = engineers.map(eng => {
+          var checked = (isAllSentinel || checkedSet[eng.toLowerCase()]) ? 'checked' : '';
+          return '<label style="display:flex; align-items:center; gap:10px; font-size:13px; color:#e2e8f0; cursor:pointer; padding:6px 4px; border-radius:6px;" onmouseover="this.style.background=\'rgba(255,255,255,0.04)\'" onmouseout="this.style.background=\'transparent\'">' +
+            '<input type="checkbox" class="v3-assign-eng-chk" value="' + eng + '" style="width:16px; height:16px; accent-color:#a78bfa; flex-shrink:0;" ' + checked + (isAllSentinel ? ' disabled' : '') + '>' +
+            '<span>' + eng + '</span></label>';
+        }).join('');
+
+        document.getElementById('v3AssignEngSelectAll').checked = isAllSentinel;
+      }, err => {
+        document.getElementById('v3AssignEngChecklist').innerHTML = '<div style="color:#f43f5e; font-size:12px;">Error: ' + err.toString() + '</div>';
+      });
+    }, err => {
+      document.getElementById('v3AssignEngChecklist').innerHTML = '<div style="color:#f43f5e; font-size:12px;">Error: ' + err.toString() + '</div>';
+    });
+  }
+  window.openAssignEngineersModalV3 = openAssignEngineersModalV3;
+
+  function handleToggleSelectAllEngineersV3() {
+    var selectAll = document.getElementById('v3AssignEngSelectAll').checked;
+    document.querySelectorAll('.v3-assign-eng-chk').forEach(chk => {
+      chk.checked = selectAll;
+      chk.disabled = selectAll;
+    });
+  }
+  window.handleToggleSelectAllEngineersV3 = handleToggleSelectAllEngineersV3;
+
+  function closeAssignEngineersModalV3() {
+    document.getElementById('v3AssignEngOverlay').style.display = 'none';
+  }
+  window.closeAssignEngineersModalV3 = closeAssignEngineersModalV3;
+
+  function handleSaveAssignedEngineersV3() {
+    if (!v3AssignEngTargetHodV3) return;
+    var selectAll = document.getElementById('v3AssignEngSelectAll').checked;
+    var checked = selectAll ? ['ALL'] : Array.from(document.querySelectorAll('.v3-assign-eng-chk:checked')).map(el => el.value);
+    var btn = document.getElementById('v3AssignEngSaveBtn');
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    runAuthedV4('updateHodAssignedEngineersV3', [v3AssignEngTargetHodV3, checked], res => {
+      btn.textContent = 'Save Assignment';
+      btn.disabled = false;
+      alert(res ? res.message : 'Failed to save.');
+      if (res && res.success) closeAssignEngineersModalV3();
+    }, err => {
+      btn.textContent = 'Save Assignment';
+      btn.disabled = false;
+      alert('Error: ' + err.toString());
+    });
+  }
+  window.handleSaveAssignedEngineersV3 = handleSaveAssignedEngineersV3;
+</script>
+
+<!-- Reset Password Modal (Admin) -->
+<div id="v3ResetPassOverlay" class="v4-login-overlay" style="display:none; position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(8,12,21,0.85), rgba(4,6,11,0.95)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;">
+  <div class="v4-login-card" style="width:400px; text-align:left; border: 1px solid var(--glass-border); border-radius:var(--radius-lg); padding:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); padding-bottom:12px; margin-bottom:16px;">
+      <h3 id="v3ResetPassTitle" style="font-family:'Space Grotesk'; font-size:18px; color:#fff; margin:0;">🔑 Reset Password</h3>
+      <button type="button" onclick="closeResetPasswordModalV3()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:12px; color:var(--text-tertiary); margin:0 0 14px 0;">Sets a new password immediately - no need to know their old one. Tell them the new password yourself; it's never shown or emailed anywhere.</p>
+    <form onsubmit="handleResetPasswordV3(event); return false;" style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">New Password *</label>
+        <input type="text" id="v3_reset_newpass" class="v3-input" required placeholder="Enter new password" style="margin-bottom:0 !important;">
+      </div>
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button type="button" onclick="closeResetPasswordModalV3()" style="flex:1; background:rgba(255,255,255,0.04) !important; border:1px solid var(--glass-border) !important; color:var(--text-secondary) !important; border-radius:var(--radius-md) !important; font-weight:600 !important; cursor:pointer;">Cancel</button>
+        <button type="submit" id="v3ResetPassBtn" style="flex:1; background:linear-gradient(135deg, var(--cyan-500) 0%, var(--violet-400) 100%) !important; color:#fff !important; font-weight:700 !important; border-radius:var(--radius-md) !important; cursor:pointer;">Reset Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  var v3ResetPassTargetUserV3 = null;
+
+  function openResetPasswordModalV3(username, fullName) {
+    v3ResetPassTargetUserV3 = username;
+    document.getElementById('v3ResetPassTitle').textContent = '🔑 Reset Password: ' + fullName;
+    document.getElementById('v3_reset_newpass').value = '';
+    document.getElementById('v3ResetPassOverlay').style.display = 'flex';
+  }
+  window.openResetPasswordModalV3 = openResetPasswordModalV3;
+
+  function closeResetPasswordModalV3() {
+    document.getElementById('v3ResetPassOverlay').style.display = 'none';
+  }
+  window.closeResetPasswordModalV3 = closeResetPasswordModalV3;
+
+  function handleResetPasswordV3(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!v3ResetPassTargetUserV3) return;
+    var newPass = document.getElementById('v3_reset_newpass').value.trim();
+    if (!newPass) { alert('Enter a new password.'); return; }
+
+    var btn = document.getElementById('v3ResetPassBtn');
+    btn.textContent = 'Resetting...';
+    btn.disabled = true;
+
+    runAuthedV4('adminResetUserPasswordV3', [v3ResetPassTargetUserV3, newPass], res => {
+      btn.textContent = 'Reset Password';
+      btn.disabled = false;
+      alert(res ? res.message : 'Failed to reset password.');
+      if (res && res.success) {
+        document.getElementById('v3_reset_newpass').value = '';
+        closeResetPasswordModalV3();
+      }
+    }, err => {
+      btn.textContent = 'Reset Password';
+      btn.disabled = false;
+      alert('Error: ' + err.toString());
+    });
+  }
+  window.handleResetPasswordV3 = handleResetPasswordV3;
+</script>
+
+<script>
+  function fetchUsersV3() {
+    // This page's DOM is cached and re-shown (not recreated) every time this
+    // tab is opened, so any modal left open from a previous visit would
+    // otherwise still be open (and possibly stacked on top of another one
+    // left open too) - force a clean slate every time this tab loads.
+    ['v3AddUserOverlay', 'v3AssignEngOverlay', 'v3ResetPassOverlay'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+
+    const tbody = document.getElementById('v3UsersTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-tertiary);">Fetching users...</td></tr>';
+    runAuthedV4('getUsersListV3', [], users => {
+        if (!users || users.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-tertiary);">No users found.</td></tr>';
+          return;
+        }
+        let html = '';
+        users.forEach(u => {
+          const deleteBtn = u.username.toLowerCase() === 'admin'
+            ? '<span style="color:var(--text-tertiary); font-size:11px; font-weight:600;">Protected Root</span>'
+            : '<button onclick="deleteUserAccountV3(\'' + u.username + '\')" style="background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.3); color:#f43f5e; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background=\'rgba(244,63,94,0.2)\'" onmouseout="this.style.background=\'rgba(244,63,94,0.1)\'">Delete</button>';
+
+          const assignBtn = (u.role === 'HOD')
+            ? '<button onclick="openAssignEngineersModalV3(\'' + u.username + '\', \'' + u.fullName.replace(/'/g, "\\'") + '\')" style="background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3); color:#a78bfa; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; margin-right:6px;">Assign Engineers</button>'
+            : '';
+
+          const resetPassBtn = '<button onclick="openResetPasswordModalV3(\'' + u.username + '\', \'' + u.fullName.replace(/'/g, "\\'") + '\')" style="background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); color:#06b6d4; padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; margin-right:6px;">Reset Password</button>';
+
+          let roleClass = 'v4-badge-green';
+          if (u.role === 'Admin') roleClass = 'v4-badge-rose';
+          else if (u.role === 'HOD') roleClass = 'v4-badge-amber';
+
+          html += '<tr>' +
+            '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); font-weight:600; color:#fff;">' + (u.username) + '</td>' +
+            '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-secondary);">' + (u.fullName) + '</td>' +
+            '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03);"><span class="v4-badge ' + roleClass + '">' + (u.role) + '</span></td>' +
+            '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); white-space:nowrap;">' + assignBtn + resetPassBtn + (deleteBtn) + '</td>' +
+            '</tr>';
+        });
+        tbody.innerHTML = html;
+    }, err => {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#f43f5e; padding:20px; text-align:center;">Error: ' + (err.toString()) + '</td></tr>';
+    });
+  }
+
+  function openAddUserModalV3() {
+    document.getElementById('v3_au_user').value = '';
+    document.getElementById('v3_au_pass').value = '';
+    document.getElementById('v3_au_name').value = '';
+
+    var roleSelect = document.getElementById('v3_au_role');
+    roleSelect.innerHTML = '<option value="">Loading roles...</option>';
+    var roleLoadSettled = false;
+    var roleLoadTimeout = setTimeout(function () {
+      if (roleLoadSettled) return;
+      roleLoadSettled = true;
+      roleSelect.innerHTML = '<option value="Engineer">Engineer (timed out loading roles - using default)</option>';
+      console.error('getRoleNamesForUserFormV3 did not respond within 10s');
+    }, 10000);
+
+    runAuthedV4('getRoleNamesForUserFormV3', [], res => {
+      if (roleLoadSettled) return;
+      roleLoadSettled = true;
+      clearTimeout(roleLoadTimeout);
+      console.log('getRoleNamesForUserFormV3 response:', res);
+      if (res && res.success && res.roleNames && res.roleNames.length) {
+        roleSelect.innerHTML = res.roleNames.map(r => '<option value="' + r + '">' + r + '</option>').join('');
+      } else {
+        roleSelect.innerHTML = '<option value="Engineer">Engineer (fallback: ' + ((res && res.message) || 'unknown error') + ')</option>';
+      }
+    }, err => {
+      if (roleLoadSettled) return;
+      roleLoadSettled = true;
+      clearTimeout(roleLoadTimeout);
+      console.error('getRoleNamesForUserFormV3 failed:', err);
+      roleSelect.innerHTML = '<option value="Engineer">Engineer (fallback: ' + (err && err.message ? err.message : err) + ')</option>';
+    });
+
+    document.getElementById('v3AddUserOverlay').style.display = 'flex';
+  }
+
+  // Bind to global scope so button onclick works
+  window.openAddUserModalV3 = openAddUserModalV3;
+
+  function closeAddUserModalV3() {
+    document.getElementById('v3AddUserOverlay').style.display = 'none';
+  }
+
+  window.closeAddUserModalV3 = closeAddUserModalV3;
+
+  function handleV3AddUser(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const u = document.getElementById('v3_au_user').value.trim();
+    const p = document.getElementById('v3_au_pass').value.trim();
+    const n = document.getElementById('v3_au_name').value.trim();
+    const r = document.getElementById('v3_au_role').value;
+    const btn = document.getElementById('v3AuBtn');
+
+    btn.textContent = 'Creating...';
+    btn.disabled = true;
+
+    runAuthedV4('addUserV3', [u, p, n, r], res => {
+      btn.textContent = 'Create User';
+      btn.disabled = false;
+      if (res.success) {
+        closeAddUserModalV3();
+        showSuccessOverlayV3("User Account Created!", res.message || ("User account for " + n + " created successfully."), function() {
+          fetchUsersV3();
+        });
+      } else {
+        alert('Failed: ' + (res.message || 'Could not create user'));
+      }
+    }, err => {
+      btn.textContent = 'Create User';
+      btn.disabled = false;
+      alert('Failed: ' + err.toString());
+    });
+  }
+
+  window.handleV3AddUser = handleV3AddUser;
+
+  function deleteUserAccountV3(username) {
+    if (!confirm('Are you sure you want to delete user account \'' + username + '\'?')) return;
+
+    runAuthedV4('deleteUserV3', [username], res => {
+      alert(res.message);
+      if (res.success) fetchUsersV3();
+    }, err => {
+      alert('Error: ' + err.toString());
+    });
+  }
+
+  window.deleteUserAccountV3 = deleteUserAccountV3;
+
+  // Auto-initialize load users
+  fetchUsersV3();
+</script>
+
+<!-- ANIMATED SUCCESS OVERLAY MODAL -->
+<div id="v3_success_overlay" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.92); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+  <style>
+    @keyframes v3ScaleUp {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .v3-success-card {
+      animation: v3ScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .v3-circle-path {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3;
+      stroke-miterlimit: 10;
+      stroke: #00e676;
+      fill: none;
+      animation: v3CircleStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    .v3-check-path {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      stroke: #00e676;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      animation: v3CheckStroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.45s forwards;
+    }
+    @keyframes v3CircleStroke {
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes v3CheckStroke {
+      100% { stroke-dashoffset: 0; }
+    }
+  </style>
+
+  <div class="v3-success-card" style="background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(0, 230, 118, 0.4); border-radius: 24px; padding: 36px 28px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(0,230,118,0.15);">
+    <div style="width: 84px; height: 84px; margin: 0 auto 20px auto; position: relative;">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="width: 100%; height: 100%;">
+        <circle class="v3-circle-path" cx="26" cy="26" r="25" />
+        <path class="v3-check-path" d="M14.1 27.2l7.1 7.2 16.8-16.8" />
+      </svg>
+    </div>
+
+    <h3 id="v3_success_overlay_title" style="font-family:'Space Grotesk', sans-serif; font-size:22px; color:#fff; margin-bottom:8px; font-weight:700;">User Account Created!</h3>
+    <p id="v3_success_overlay_msg" style="font-size:13px; color:#94a3b8; margin-bottom:24px; line-height:1.5;">User account has been added successfully!</p>
+
+    <button type="button" onclick="closeSuccessOverlayV3()" style="background: linear-gradient(135deg, #00e676, #00b0ff); border: none; color: #0f172a; padding: 12px 28px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(0,230,118,0.3); font-family:'Space Grotesk', sans-serif;">
+      Close Window
+    </button>
+  </div>
+</div>
+
+<script>
+  let onSuccessOverlayCloseCallbackV3 = null;
+
+  function showSuccessOverlayV3(title, message, onCloseCallback) {
+    const overlay = document.getElementById('v3_success_overlay');
+    const titleEl = document.getElementById('v3_success_overlay_title') || document.getElementById('v3_success_title');
+    const msgEl = document.getElementById('v3_success_overlay_msg') || document.getElementById('v3_success_subtitle');
+
+    if (titleEl && title) titleEl.textContent = title;
+    if (msgEl && message) msgEl.textContent = message;
+
+    onSuccessOverlayCloseCallbackV3 = onCloseCallback || null;
+    window._v3OnSuccessReset = onCloseCallback || null;
+
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+  function closeSuccessOverlayV3() {
+    const overlay = document.getElementById('v3_success_overlay');
+    if (overlay) overlay.style.display = 'none';
+
+    if (typeof onSuccessOverlayCloseCallbackV3 === 'function') {
+      onSuccessOverlayCloseCallbackV3();
+      onSuccessOverlayCloseCallbackV3 = null;
+    }
+    if (typeof window._v3OnSuccessReset === 'function') {
+      window._v3OnSuccessReset();
+      window._v3OnSuccessReset = null;
+    }
+  }
+
+  window.showSuccessOverlayV3 = showSuccessOverlayV3;
+  window.closeSuccessOverlayV3 = closeSuccessOverlayV3;
+</script>

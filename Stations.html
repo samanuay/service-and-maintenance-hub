@@ -1,0 +1,287 @@
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+  <h2 style="font-family:'Space Grotesk'; font-size:20px; color:#fff;">Stations</h2>
+</div>
+
+<p style="font-size:12px; color:var(--text-tertiary); margin:-8px 0 18px 0; max-width:640px;">Every commissioned station, its chargers, assigned engineer, and investor contact for PM report emails. Click a station to view chargers and edit its investor details or reassign its engineer.</p>
+
+<div class="v4-table-card" style="padding:16px; background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius-lg); overflow-x:auto;">
+  <table class="v4-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+    <thead>
+      <tr>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px; width:50px;">S.No</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Station</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Chargers</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Assigned Engineer</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Investor Email</th>
+        <th style="color:var(--text-tertiary); text-align:left; padding:12px 20px;">Action</th>
+      </tr>
+    </thead>
+    <tbody id="v3StationsTableBody">
+      <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-tertiary);">Loading stations...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Station Detail Modal -->
+<div id="v3StationOverlay" class="v4-login-overlay" style="display:none; position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(8,12,21,0.85), rgba(4,6,11,0.95)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px;">
+  <div class="v4-login-card" style="width:560px; max-height:88vh; overflow-y:auto; text-align:left; border: 1px solid var(--glass-border); border-radius:var(--radius-lg); padding:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); padding-bottom:12px; margin-bottom:16px;">
+      <span style="font-family:'Space Grotesk'; font-size:18px; color:#fff;">&#127964; Station</span>
+      <button type="button" onclick="closeStationModalV3()" style="background:none; border:none; color:var(--text-tertiary); font-size:18px; cursor:pointer;">&#10005;</button>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Station Name</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="v3StationNameInput" class="v3-input" style="margin-bottom:0 !important; flex:1;">
+        <button type="button" onclick="handleSaveStationNameV3()" id="v3StationNameSaveBtn" style="background:linear-gradient(135deg, var(--cyan-500) 0%, var(--violet-400) 100%) !important; color:#fff !important; font-weight:700 !important; border-radius:var(--radius-md) !important; padding:8px 18px !important; border:none; cursor:pointer; white-space:nowrap;">Rename</button>
+      </div>
+      <p style="font-size:11px; color:var(--text-tertiary); margin:6px 0 0 0;">Renaming updates this station and its Charger Inventory rows everywhere. Past PM/commissioning reports keep the original name.</p>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <h4 style="font-size:12px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:8px;">Chargers</h4>
+      <div id="v3StationChargersList" style="display:flex; flex-direction:column; gap:10px;"></div>
+    </div>
+
+    <div style="border-top:1px solid var(--glass-border); padding-top:16px; margin-bottom:16px;">
+      <h4 style="font-size:12px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:10px;">Investor Contact (for PM report emails)</h4>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Investor Name</label>
+          <input type="text" id="v3_station_investor_name" class="v3-input" placeholder="e.g. Acme Capital" style="margin-bottom:0 !important;">
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:6px;">Investor Email(s)</label>
+          <input type="text" id="v3_station_investor_emails" class="v3-input" placeholder="comma-separated, e.g. a@x.com, b@x.com" style="margin-bottom:0 !important;">
+        </div>
+        <button type="button" onclick="handleSaveStationInvestorV3()" id="v3StationInvestorSaveBtn" style="align-self:flex-start; background:linear-gradient(135deg, var(--cyan-500) 0%, var(--violet-400) 100%) !important; color:#fff !important; font-weight:700 !important; border-radius:var(--radius-md) !important; padding:8px 18px !important; border:none; cursor:pointer;">Save Investor Info</button>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--glass-border); padding-top:16px;">
+      <h4 style="font-size:12px; text-transform:uppercase; color:var(--text-tertiary); font-weight:700; margin-bottom:10px;">Assigned Engineer</h4>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <select id="v3_station_engineer_select" class="v3-input" style="margin-bottom:0 !important; flex:1;">
+          <option value="">Loading engineers...</option>
+        </select>
+        <button type="button" onclick="handleSaveStationEngineerV3()" id="v3StationEngineerSaveBtn" style="background:linear-gradient(135deg, var(--cyan-500) 0%, var(--violet-400) 100%) !important; color:#fff !important; font-weight:700 !important; border-radius:var(--radius-md) !important; padding:8px 18px !important; border:none; cursor:pointer; white-space:nowrap;">Reassign</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var v3StationsCacheV3 = [];
+  var v3ActiveStationNameV3 = null;
+
+  function fetchStationsV3() {
+    // This page's DOM is cached and re-shown (not recreated) on every visit
+    // to this tab - reset any modal left open from a previous visit.
+    var stationOverlay = document.getElementById('v3StationOverlay');
+    if (stationOverlay) stationOverlay.style.display = 'none';
+
+    var tbody = document.getElementById('v3StationsTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-tertiary);">Loading stations...</td></tr>';
+
+    runAuthedV4('getAllStationsV3', [], res => {
+      if (!res || !res.success) {
+        tbody.innerHTML = '<tr><td colspan="6" style="color:#f43f5e; padding:20px; text-align:center;">' + (res ? res.message : 'Failed to load stations') + '</td></tr>';
+        return;
+      }
+      v3StationsCacheV3 = res.stations || [];
+
+      if (!v3StationsCacheV3.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-tertiary);">No stations found yet - they appear automatically once commissioned.</td></tr>';
+        return;
+      }
+
+      var html = '';
+      v3StationsCacheV3.forEach((s, idx) => {
+        var investorBadge = s.investorEmails
+          ? '<span class="v4-badge v4-badge-green">' + s.investorEmails + '</span>'
+          : '<span style="color:var(--text-tertiary); font-size:11px;">Not set</span>';
+
+        html += '<tr>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-tertiary);">' + (idx + 1) + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); font-weight:600; color:#fff;">' + s.stationName + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-secondary);">' + s.chargerCount + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-secondary);">' + (s.assignedEngineer || '<span style="color:var(--text-tertiary);">Unassigned</span>') + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03); font-size:11px; max-width:220px;">' + investorBadge + '</td>' +
+          '<td style="padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.03);"><button onclick="openStationModalV3(\'' + s.stationName.replace(/'/g, "\\'") + '\')" style="background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); color:#06b6d4; padding:4px 12px; border-radius:6px; font-size:11px; cursor:pointer;">View / Edit</button></td>' +
+          '</tr>';
+      });
+      tbody.innerHTML = html;
+    }, err => {
+      tbody.innerHTML = '<tr><td colspan="6" style="color:#f43f5e; padding:20px; text-align:center;">Error: ' + err.toString() + '</td></tr>';
+    });
+  }
+  window.fetchStationsV3 = fetchStationsV3;
+
+  function escapeAttrV3(s) {
+    return (s || '').toString().replace(/"/g, '&quot;');
+  }
+
+  function openStationModalV3(stationName) {
+    v3ActiveStationNameV3 = stationName;
+    document.getElementById('v3StationNameInput').value = stationName;
+    document.getElementById('v3StationChargersList').innerHTML = '<div style="color:var(--text-tertiary); font-size:12px;">Loading...</div>';
+    document.getElementById('v3_station_investor_name').value = '';
+    document.getElementById('v3_station_investor_emails').value = '';
+    document.getElementById('v3_station_engineer_select').innerHTML = '<option value="">Loading engineers...</option>';
+    document.getElementById('v3StationOverlay').style.display = 'flex';
+
+    runAuthedV4('getStationDetailV3', [stationName], res => {
+      if (!res || !res.success) {
+        document.getElementById('v3StationChargersList').innerHTML = '<div style="color:#f43f5e; font-size:12px;">' + (res ? res.message : 'Failed to load') + '</div>';
+        return;
+      }
+
+      renderStationChargersV3(res.chargers || []);
+
+      document.getElementById('v3_station_investor_name').value = res.station.investorName || '';
+      document.getElementById('v3_station_investor_emails').value = res.station.investorEmails || '';
+
+      loadEngineerDropdownForStationV3(res.station.assignedEngineer || '');
+    }, err => {
+      document.getElementById('v3StationChargersList').innerHTML = '<div style="color:#f43f5e; font-size:12px;">Error: ' + err.toString() + '</div>';
+    });
+  }
+  window.openStationModalV3 = openStationModalV3;
+
+  function renderStationChargersV3(chargers) {
+    var container = document.getElementById('v3StationChargersList');
+    if (!chargers.length) {
+      container.innerHTML = '<div style="color:var(--text-tertiary); font-size:12px;">No chargers recorded for this station.</div>';
+      return;
+    }
+
+    container.innerHTML = chargers.map((c, idx) => {
+      var rowId = 'v3_chg_' + idx;
+      return '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:8px; padding:10px;">' +
+        '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">' +
+          '<div><label style="display:block; font-size:10px; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:3px;">CP ID</label><input type="text" id="' + rowId + '_cpid" class="v3-input" value="' + escapeAttrV3(c.cpId) + '" style="margin-bottom:0 !important;"></div>' +
+          '<div><label style="display:block; font-size:10px; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:3px;">Serial No</label><input type="text" id="' + rowId + '_serial" class="v3-input" value="' + escapeAttrV3(c.serialNo) + '" style="margin-bottom:0 !important;"></div>' +
+          '<div><label style="display:block; font-size:10px; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:3px;">OEM</label><input type="text" id="' + rowId + '_oem" class="v3-input" value="' + escapeAttrV3(c.oem) + '" style="margin-bottom:0 !important;"></div>' +
+          '<div><label style="display:block; font-size:10px; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:3px;">Power</label><input type="text" id="' + rowId + '_power" class="v3-input" value="' + escapeAttrV3(c.power) + '" style="margin-bottom:0 !important;"></div>' +
+        '</div>' +
+        '<button type="button" onclick="handleSaveChargerV3(' + c.rowIndex + ', \'' + rowId + '\')" id="' + rowId + '_savebtn" style="background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); color:#06b6d4; padding:5px 12px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">Save Charger</button>' +
+        '</div>';
+    }).join('');
+  }
+
+  function handleSaveChargerV3(rowIndex, rowId) {
+    if (!v3ActiveStationNameV3) return;
+    var cpId = document.getElementById(rowId + '_cpid').value.trim();
+    var serialNo = document.getElementById(rowId + '_serial').value.trim();
+    var oem = document.getElementById(rowId + '_oem').value.trim();
+    var power = document.getElementById(rowId + '_power').value.trim();
+    var btn = document.getElementById(rowId + '_savebtn');
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    runAuthedV4('updateStationChargerV3', [v3ActiveStationNameV3, rowIndex, cpId, serialNo, oem, power], res => {
+      btn.textContent = 'Save Charger';
+      btn.disabled = false;
+      alert(res ? res.message : 'Failed to save.');
+      if (res && res.success) fetchStationsV3();
+    }, err => {
+      btn.textContent = 'Save Charger';
+      btn.disabled = false;
+      alert('Error: ' + err.toString());
+    });
+  }
+  window.handleSaveChargerV3 = handleSaveChargerV3;
+
+  function handleSaveStationNameV3() {
+    if (!v3ActiveStationNameV3) return;
+    var newName = document.getElementById('v3StationNameInput').value.trim();
+    if (!newName) { alert('Station name cannot be empty.'); return; }
+    var btn = document.getElementById('v3StationNameSaveBtn');
+
+    btn.textContent = 'Renaming...';
+    btn.disabled = true;
+
+    runAuthedV4('updateStationNameV3', [v3ActiveStationNameV3, newName], res => {
+      btn.textContent = 'Rename';
+      btn.disabled = false;
+      alert(res ? res.message : 'Failed to rename.');
+      if (res && res.success) {
+        v3ActiveStationNameV3 = res.newName || newName;
+        fetchStationsV3();
+      }
+    }, err => {
+      btn.textContent = 'Rename';
+      btn.disabled = false;
+      alert('Error: ' + err.toString());
+    });
+  }
+  window.handleSaveStationNameV3 = handleSaveStationNameV3;
+
+  function loadEngineerDropdownForStationV3(currentEngineer) {
+    var select = document.getElementById('v3_station_engineer_select');
+    runAuthedV4('getEngineersVisibleToCallerV3', [], res => {
+      var engineers = (res && res.engineers) ? res.engineers : [];
+      var options = '<option value="">Unassigned</option>' + engineers.map(e => {
+        var sel = (e === currentEngineer) ? ' selected' : '';
+        return '<option value="' + e + '"' + sel + '>' + e + '</option>';
+      }).join('');
+      select.innerHTML = options;
+      if (currentEngineer && engineers.indexOf(currentEngineer) === -1) {
+        select.innerHTML = '<option value="' + currentEngineer + '" selected>' + currentEngineer + ' (current)</option>' + options;
+      }
+    }, err => {
+      select.innerHTML = '<option value="">Failed to load engineers</option>';
+    });
+  }
+
+  function closeStationModalV3() {
+    document.getElementById('v3StationOverlay').style.display = 'none';
+  }
+  window.closeStationModalV3 = closeStationModalV3;
+
+  function handleSaveStationInvestorV3() {
+    if (!v3ActiveStationNameV3) return;
+    var name = document.getElementById('v3_station_investor_name').value.trim();
+    var emails = document.getElementById('v3_station_investor_emails').value.trim();
+    var btn = document.getElementById('v3StationInvestorSaveBtn');
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    runAuthedV4('updateStationInvestorInfoV3', [v3ActiveStationNameV3, name, emails], res => {
+      btn.textContent = 'Save Investor Info';
+      btn.disabled = false;
+      alert(res ? res.message : 'Failed to save.');
+      if (res && res.success) fetchStationsV3();
+    }, err => {
+      btn.textContent = 'Save Investor Info';
+      btn.disabled = false;
+      alert('Error: ' + err.toString());
+    });
+  }
+  window.handleSaveStationInvestorV3 = handleSaveStationInvestorV3;
+
+  function handleSaveStationEngineerV3() {
+    if (!v3ActiveStationNameV3) return;
+    var engineer = document.getElementById('v3_station_engineer_select').value;
+    var btn = document.getElementById('v3StationEngineerSaveBtn');
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    runAuthedV4('updateStationEngineerV3', [v3ActiveStationNameV3, engineer], res => {
+      btn.textContent = 'Reassign';
+      btn.disabled = false;
+      alert(res ? res.message : 'Failed to save.');
+      if (res && res.success) fetchStationsV3();
+    }, err => {
+      btn.textContent = 'Reassign';
+      btn.disabled = false;
+      alert('Error: ' + err.toString());
+    });
+  }
+  window.handleSaveStationEngineerV3 = handleSaveStationEngineerV3;
+</script>
